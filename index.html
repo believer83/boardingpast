@@ -695,7 +695,8 @@ header.top .wordmark { transition: height .2s ease; }
 header.top.compact { padding: 6px 0; }
 header.top.compact .wordmark { height: 40px; }
 header.top.compact .wordmark .tagline { display: none; }
-@media (max-width: 520px) {  /* no blur here: it would hold the fixed bottom tab bar inside the header */
+@media (max-width: 520px) {  /* no blur and no view-transition name here: either makes the header a layer of its own, which
+  would hold the fixed bottom tab bar inside it, under the cards and photos that come later in the page */
   header.top { position: static; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; } }
 header.top h1 { font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -0.02em; }
 /* Contreel logo (brand kit): "contreel" in Sora with a contrail and a plane, the tagline underneath */
@@ -814,6 +815,7 @@ header.top { view-transition-name: masthead; }
     background: color-mix(in srgb, var(--surface-1) 97%, var(--page)); transform: translateZ(0); view-transition-name: tabbar;
     border-top: 1px solid var(--border); box-shadow: 0 -6px 24px rgba(0,0,0,.25); }
   ::view-transition-group(tabbar), ::view-transition-old(tabbar), ::view-transition-new(tabbar) { animation: none; }
+  header.top { view-transition-name: none; }  /* a named header is a layer of its own and would hold the bar under the page */
   ::view-transition-old(tabbar) { display: none; }
   body::after { display: none; }  /* the film grain: a full-screen blended layer over the bar, costly on phones */
   .tabs button { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px; border-radius: 12px; font-size: 11px; }
@@ -1306,10 +1308,17 @@ table.flights tr.tr-row:hover { background: none; }
 .more-row { text-align: center; margin: 16px 0; }
 
 /* Flight video */
-.video-modal { position: fixed; inset: 0; z-index: 3000; background: rgba(4,3,18,0.82); display: grid; place-items: center; padding: 16px; }
+/* the video window: a near-solid, blurred backdrop (above the film grain) so the page doesn't show through; the options
+   on a panel of their own; the video takes the space left and the page behind doesn't scroll */
+.video-modal { position: fixed; inset: 0; z-index: 4100; display: grid; place-items: center; padding: 16px;
+  background: color-mix(in srgb, var(--v-bg) 93%, transparent); -webkit-backdrop-filter: blur(24px) saturate(1.2); backdrop-filter: blur(24px) saturate(1.2); }
 .video-modal[hidden] { display: none; }
-.video-box { width: min(1100px, 100%); max-height: 100%; display: flex; flex-direction: column; gap: 10px; }
-.video-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; color: var(--v-text); }
+html.video-open { overflow: hidden; }
+.video-box { width: min(1100px, 100%); height: 100%; max-height: calc(100dvh - 32px); display: flex; flex-direction: column; gap: 12px; }
+.video-bar { display: flex; gap: 8px 12px; align-items: center; flex-wrap: wrap; color: var(--v-text); flex: none;
+  padding: 10px 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+  background: color-mix(in srgb, var(--v-ui) 80%, var(--v-bg)); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+.video-bar label { white-space: nowrap; }
 .video-bar b { font-size: 16px; margin-right: 6px; }
 .video-bar select { border: 1px solid rgba(255,255,255,0.15); background: var(--v-ui); color: var(--v-text); border-radius: 8px; padding: 4px 6px; margin-left: 4px; }
 .video-bar .icon-btn { background: var(--v-ui); color: var(--v-text); border-color: rgba(255,255,255,0.15); }
@@ -1322,7 +1331,17 @@ table.flights tr.tr-row:hover { background: none; }
 .video-bar .video-opt.off { opacity: 0.45; cursor: default; }
 #videoLengthVal { display: inline-block; min-width: 3.2em; font-variant-numeric: tabular-nums; }
 #videoClose { margin-left: auto; }
-#videoCanvas { width: 100%; max-height: calc(100vh - 110px); object-fit: contain; border-radius: 16px; background: var(--v-bg); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+#videoCanvas { flex: 1 1 0; min-height: 0; width: 100%; object-fit: contain; border-radius: 16px; }
+@media (max-width: 520px) {  /* phone: a compact panel, so the video keeps most of the screen */
+  .video-modal { padding: 10px; }
+  .video-box { max-height: calc(100dvh - 20px); gap: 8px; }
+  .video-bar { gap: 6px 10px; padding: 8px 10px; font-size: 13px; }
+  .video-bar b { display: none; }
+  .video-bar select { padding: 3px 4px; font-size: 13px; }
+  .video-bar input[type=range] { width: 80px; }
+  .video-bar .icon-btn { padding: 5px 10px; font-size: 13px; }
+  #videoClose { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; }
+  .video-bar { padding-right: 48px; position: relative; } }
 .play-sm { border: 0; background: var(--grad); color: var(--on-grad); width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 11px; flex: none; }
 .play-sm.flight { width: 20px; height: 20px; font-size: 8px; padding: 0; }  /* one flight: smaller than a trip's */
 .play-sm.trip { width: 30px; height: 30px; font-size: 12px; }
@@ -5100,6 +5119,7 @@ function openVideo(flights, title, cards = true, fromReel = false) {
     ? [video.flights[0].flight_no, `${video.flights[0].from} → ${video.flights[0].to}`].filter(Boolean).join(" · ")
     : stops.join(" → "));
   $("videoModal").hidden = false;
+  document.documentElement.classList.add("video-open");
   $("videoStatus").textContent = "Loading…";
   checkVideoWebgl();
   prepareVideo().then(() => { $("videoStatus").textContent = ""; playVideo(false); })
@@ -5152,6 +5172,7 @@ function closeVideo() {
   releaseVideoMap();
   if (video.recorder && video.recorder.state === "recording") video.recorder.stop();
   $("videoModal").hidden = true;
+  document.documentElement.classList.remove("video-open");
 }
 
 // free the hidden video map's WebGL context (browsers allow only a few); it is rebuilt for the next video
