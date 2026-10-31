@@ -701,7 +701,14 @@ header.top h1 { font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -0
 /* Contreel logo (brand kit): "contreel" in Sora with a contrail and a plane, the tagline underneath */
 .brand { display: inline-flex; margin: -8px 0 -6px; }
 .wordmark { display: block; height: 96px; width: auto; overflow: visible; }
-@media (max-width: 520px) { .wordmark { height: 80px; } }
+/* phone: the logo, the flight count and the round buttons share one row (the tabs are the bottom bar) */
+@media (max-width: 520px) {
+  .wordmark { height: 64px; }
+  header.top { flex-wrap: nowrap; gap: 8px; }
+  header.top .brand { flex: none; }
+  header.top .count { flex: 1 1 auto; min-width: 0; overflow: hidden; text-align: right; font-size: 12px; line-height: 1.25; }
+  header.top .round-btn { width: 34px; height: 34px; flex: none; } }
+@media (max-width: 400px) { .wordmark { height: 54px; } header.top { gap: 6px; } }
 /* materials: a very fine film grain over everything, light catching the top edge of cards, and raised layers a touch
    lighter in dark mode (pop-ups, the compact header, a hovered card) */
 body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 4000; opacity: .05; mix-blend-mode: overlay;
@@ -802,8 +809,13 @@ header.top { view-transition-name: masthead; }
 @media (max-width: 520px) {
   .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 2000; border-radius: 18px 18px 0 0; max-width: none; overflow: visible;
     padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); justify-content: space-around; gap: 0;
-    background: color-mix(in srgb, var(--surface-1) 90%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    /* opaque, no backdrop blur, on its own layer and kept out of the tab transition: a blurred fixed bar inside the
+       header flickered on phones while scrolling and switching tabs */
+    background: color-mix(in srgb, var(--surface-1) 97%, var(--page)); transform: translateZ(0); view-transition-name: tabbar;
     border-top: 1px solid var(--border); box-shadow: 0 -6px 24px rgba(0,0,0,.25); }
+  ::view-transition-group(tabbar), ::view-transition-old(tabbar), ::view-transition-new(tabbar) { animation: none; }
+  ::view-transition-old(tabbar) { display: none; }
+  body::after { display: none; }  /* the film grain: a full-screen blended layer over the bar, costly on phones */
   .tabs button { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px; border-radius: 12px; font-size: 11px; }
   .tabs button[aria-selected="true"] { box-shadow: none; }
   .tab-ic { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; stroke-linecap: round; }
@@ -1024,7 +1036,7 @@ table.flights tbody tr.sel { background: var(--wash); box-shadow: inset 3px 0 0 
 /* Stats */
 /* passport on the left, key figures and records beside it; stacked on narrow screens */
 .stats-top { display: grid; grid-template-columns: minmax(0, 620px) minmax(0, 1fr); gap: 16px; align-items: start; margin-top: 16px; }
-.stats-side { display: grid; gap: 12px; min-width: 0; }
+.stats-side { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; }
 #passport { position: relative; }
 .pp-actions { display: flex; justify-content: center; gap: var(--s2); flex-wrap: wrap; margin-top: 10px; }
 @media (max-width: 1080px) { .stats-top { grid-template-columns: minmax(0, 1fr); } #passport { position: static; }
@@ -1032,6 +1044,9 @@ table.flights tbody tr.sel { background: var(--wash); box-shadow: inset 3px 0 0 
 .stats-left { display: grid; gap: var(--s4); align-content: start; min-width: 0; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 .hero-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+/* tiles may shrink below their content's width (a big figure, a sparkline), so a phone never scrolls sideways */
+.tiles > *, .hero-row > * { min-width: 0; }
+@media (max-width: 520px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .tile.hero { padding: 16px 18px 0; overflow: hidden; display: flex; flex-direction: column; }
 .tile.hero .value { font-size: 34px; font-weight: 800; background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .tile.hero .spark { margin: 8px -18px 0; height: 46px; cursor: crosshair; }
@@ -1148,6 +1163,7 @@ table.flights tbody tr.sel { background: var(--wash); box-shadow: inset 3px 0 0 
 .records tbody tr { cursor: pointer; }
 .records tbody tr:hover { background: var(--wash); }
 .records td { padding: 8px 0; vertical-align: middle; }
+@media (max-width: 520px) { .records td:first-child { white-space: normal; padding-right: 8px; } .records td { overflow-wrap: anywhere; } }
 .rec-head { font-weight: 600; }
 .rec-route { font-weight: 500; }
 .rec-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; color: var(--text-muted); font-size: 12px; margin-top: 2px; }
