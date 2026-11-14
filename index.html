@@ -2601,7 +2601,7 @@ td.empty-cell { cursor: default; }
       <label>Cards <select id="videoCardTheme"><option value="dark">Dark</option><option value="light">Light</option><option value="off">Off</option></select></label>
       <label class="video-opt" id="videoNamesOpt"><input type="checkbox" id="videoNames"> Country names</label>
       <label>Length <input type="range" id="videoLength" min="10" max="60" step="1" value="12"> <span id="videoLengthVal">12 s</span></label>
-      <label>Format <select id="videoFormat"><option value="story" selected>9:16 Story</option><option value="landscape">16:9</option><option value="square">Square</option></select></label>
+      <label>Format <select id="videoFormat"><option value="story" selected>9:16 Reel / Story</option><option value="landscape">16:9</option><option value="square">Square</option></select></label>
       <button class="icon-btn" id="videoReplay" type="button"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4v4.5H9"/></svg></span>Replay</button>
       <button class="icon-btn primary" id="videoRecord" type="button"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></svg></span>Download video</button>
       <span class="muted" id="videoStatus"></span>
@@ -3686,7 +3686,7 @@ async function makeImage(fl, past, format, step = () => {}) {  // the picture as
     if (one) facts.firstElementChild.remove();  // "1 flight"
     const shotImg = el("img", { alt: "" }), hud = el("div", { class: "pc-hud", style: `background:linear-gradient(rgba(${P.shade},.82), rgba(${P.shade},.55) 65%, rgba(${P.shade},0))` },
       el("div", { class: "pc-kick", text: tripKicker(fl) }),
-      el("h2", { text: tripTitle(fl, tripHome(fl, past)) }),
+      el("h2", { text: tripTitle(fl) }),
       facts, tripLine(fl, !past, true));
     const legs = el("div", { class: "pc-legs" + (fl.length > 2 ? " tight" : "") }, tripLegs(fl)), room = el("div", { class: "pc-room" }, legs), credit = el("div", { class: "pc-credit" });
     const mapBox = el("div", { class: "pc-map" }, shotImg, hud);
@@ -4058,8 +4058,7 @@ function tripMap(t, fl) {
   return el("div", { class: "tr-side" }, panel, profileBlock(byTime(fl), "", false));
 }
 // a trip's title: where it began to where it ended
-const tripTitle = (fl, home) => { const place = c => `${flagOf(c)} ${cityOf(c)}`.trim(); return `${place(fl[0].from)} → ${place(fl[fl.length - 1].to)}${home ? " · home" : ""}`; };
-const tripHome = (fl, past) => { const last = fl[fl.length - 1]; return past && isHome(last.to, last.date.length === 4 ? last.date + "-07-01" : last.date); };
+const tripTitle = fl => { const place = c => `${flagOf(c)} ${cityOf(c)}`.trim(); return `${place(fl[0].from)} → ${place(fl[fl.length - 1].to)}`; };
 const tripWhen = fl => { const first = fl[0], last = fl[fl.length - 1]; return first.date.length === 10 ? fmtDay(first.date) + (last.date !== first.date ? " – " + fmtDay(last.date) : "") : first.date; };
 // the dates, short: "20–21 Feb 2009", "28 Dec 2022 – 7 Jan 2023"
 function tripDates(fl) {
@@ -4082,7 +4081,7 @@ function tripHeader(t, fl, past, extra = null) {
   return el("div", { class: "upc-head" },
     el("div", { class: "upc-title" },
       el("div", { class: "upc-kick", title: tripWhen(fl) }, tripDates(fl), " · ", el("b", { class: past ? "" : "soon", text: when })),
-      el("h2", { text: tripTitle(fl, tripHome(fl, past)) })),
+      el("h2", { text: tripTitle(fl) })),
     tripFacts(fl, true),
     el("div", { class: "upc-actions" }, extra,
       past ? null : button("calendar", "Add to calendar", "Calendar file for Apple, Google or Outlook calendars",
@@ -7157,7 +7156,7 @@ function openVideo(flights, title, cards = true, fromReel = false) {
   if (style.dayNight) $("videoNight").checked = true;  // Map style's day & night carries over
   video.flights = [...flights].sort((a, b) => a.sortKey < b.sortKey ? -1 : 1);
   video.past = !video.flights.some(f => f.future);
-  video.title = title || tripTitle(video.flights, tripHome(video.flights, video.past));
+  video.title = title || tripTitle(video.flights);
   video.kicker = tripKicker(video.flights);
   $("videoModal").hidden = false;
   document.documentElement.classList.add("video-open");
@@ -7227,7 +7226,7 @@ function releaseVideoMap() {
 /* Timeline: intro zoom, one segment per flight (time ~ sqrt(distance)) with a stop between, outro overview.
    Many flights for the length (e.g. a whole year) make a "montage": shorter legs and stops, wider views. */
 function videoPlan(total) {
-  const n = video.flights.length, intro = 1.6, outro = 2.2;
+  const n = video.flights.length, intro = 2.0, outro = 2.6;
   const slot = (total - intro - outro) / n, montage = slot < 1.8;  // below ~1.8 s a flight can't show take-off and landing
   const minLeg = montage ? Math.max(0.3, slot * 0.55) : 2.2;
   const legs = video.flights.map(f => {
@@ -7239,7 +7238,7 @@ function videoPlan(total) {
     leg.prog = flightProgress; leg.alt = u => leg.arc * arcShape(u);
     return leg;
   });
-  const dwells = legs.slice(1).map(() => montage ? Math.min(0.6, slot * 0.2) : 0.6);
+  const dwells = legs.slice(1).map(() => montage ? Math.min(0.6, slot * 0.2) : 0.8);  // a beat on the ground after each landing
   const weights = legs.map(l => Math.sqrt(Math.max(l.f.km, 150)));
   const sum = weights.reduce((s, w) => s + w, 0);
   const spare = Math.max(0, total - intro - outro - dwells.reduce((s, d) => s + d, 0) - minLeg * n);
@@ -7256,7 +7255,10 @@ function videoPlan(total) {
     l.cruise = Math.max(cruiseKm(l.f.km), 1.4 * Math.max(l.kmFrom, l.kmTo));
   });
   const pts = [legs[0].a, ...legs.map(l => l.b)];
-  const centre = d3.geoCentroid({ type: "MultiPoint", coordinates: pts });
+  // the middle of the two stops furthest apart, so the whole trip is on the visible side of the globe at the end
+  let far = [pts[0], pts[0]], farD = -1;
+  pts.forEach(p => pts.forEach(q => { const d = d3.geoDistance(p, q); if (d > farD) { farD = d; far = [p, q]; } }));
+  const centre = farD > 0 ? d3.geoInterpolate(far[0], far[1])(0.5) : d3.geoCentroid({ type: "MultiPoint", coordinates: pts });
   const spreadKm = Math.max(...pts.map(p => d3.geoDistance(centre, p))) * EARTH_KM;
   const last = legs[n - 1];
   return { intro, outro, legs, centre, montage, spreadKm, outroStart: last.end + 0.3, end: last.end + 0.3 + outro,
@@ -7268,14 +7270,17 @@ function videoState(plan, t) {
   const { legs } = plan;
   const first = legs[0], last = legs[legs.length - 1];
   if (t < first.start) {
-    // from space: the whole globe turns a moment, then a fast dive down to the departure airport
-    const k = t / plan.intro, dive = easeInOut(smooth(0.12, 1, k)) ** 1.3;
-    return { centre: d3.geoInterpolate([first.a[0] + 55, first.a[1] - 12], first.a)(easeInOut(smooth(0, 0.8, k))),
-             km: logLerp(30000, first.kmFrom, dive), leg: first, k: 0, z: 0, phase: "dep", utc: first.utc0 };
+    // the hook: the whole trip on the globe, lit up, drifting a moment; then a fast dive down to the departure airport
+    const k = t / plan.intro, dive = easeInOut(smooth(0.3, 1, k)) ** 1.3;
+    const from = [plan.centre[0] + 6 * (1 - smooth(0, 0.3, k)), plan.centre[1]];
+    return { centre: d3.geoInterpolate(from, first.a)(easeInOut(smooth(0.3, 0.9, k))),
+             km: logLerp(plan.overviewKm, first.kmFrom, dive), leg: first, k: 0, z: 0, phase: "dep", utc: first.utc0, intro: true };
   }
   if (t >= last.end) {  // landed; then pull back to the whole route
-    const k = easeInOut(Math.min(1, Math.max(0, (t - plan.outroStart) / (plan.outro * 0.75))));
-    return { centre: d3.geoInterpolate(last.b, plan.centre)(k), km: logLerp(last.kmTo, plan.overviewKm, k), leg: last, k: 1, z: 0,
+    const k = easeInOut(Math.min(1, Math.max(0, (t - plan.outroStart) / 1.4)));
+    const turn = Math.max(0, t - plan.outroStart) * 2.5;  // then the globe keeps turning, gently
+    const c = d3.geoInterpolate(last.b, plan.centre)(k);
+    return { centre: [c[0] + turn * k, c[1]], km: logLerp(last.kmTo, plan.overviewKm, k), leg: last, k: 1, z: 0,
              phase: k > 0 ? "done" : "arr", utc: last.utc1 };
   }
   const i = legs.findIndex(l => t < l.end);
@@ -7283,7 +7288,7 @@ function videoState(plan, t) {
   if (t < leg.start) {  // stop between flights: pan (and lift a little) if the next flight leaves from elsewhere
     const prev = legs[i - 1], k = easeInOut((t - prev.end) / (leg.start - prev.end));
     const a = prev.b, b = leg.a, gap = d3.geoDistance(a, b) * EARTH_KM;
-    const km = logLerp(prev.kmTo, leg.kmFrom, k) + Math.sin(Math.PI * k) * gap * 1.2;
+    const km = logLerp(prev.kmTo, leg.kmFrom, k) * (1 + 0.45 * Math.sin(Math.PI * k)) + Math.sin(Math.PI * k) * gap * 1.2;  // a breath: pull back a little, then in again
     const utc = prev.utc1 != null && leg.utc0 != null ? lerp(prev.utc1, leg.utc0, k) : leg.utc0;
     return { centre: d3.geoInterpolate(a, b)(k), km, leg, k: 0, z: 0, phase: "dep", between: prev, gap: k, utc };
   }
@@ -7531,6 +7536,7 @@ async function videoMap(W, H, mapKey) {
     throw new Error("The photo maps need WebGL, which your browser refused – choose the Stylised map, or turn on hardware acceleration and reload.");
   }
   await new Promise(res => { m.once("load", res); setTimeout(res, 15000); });
+  if (m.getCanvas().width !== W || m.getCanvas().height !== H) m.resize();  // measured before the host had its size: measure again
   m.setProjection({ type: "globe" });
   const empty = { type: "FeatureCollection", features: [] };
   const P = pal();
@@ -7543,9 +7549,9 @@ async function videoMap(W, H, mapKey) {
   m.addLayer({ id: "v-lights", type: "raster", source: "v-lights", layout: { visibility: "none" }, paint: { "raster-opacity": 0.95, "raster-fade-duration": 0 } });
   m.addSource("v-countries", { type: "geojson", data: empty });  // the trip's countries, outlined in neon
   const cc = colourOf(style.country) || P.holo[0];  // Map style's visited countries colour
-  m.addLayer({ id: "v-country-fill", type: "fill", source: "v-countries", paint: { "fill-color": cc, "fill-opacity": 0.06 } });
-  m.addLayer({ id: "v-country-glow", type: "line", source: "v-countries", paint: { "line-color": cc, "line-width": 5, "line-blur": 4, "line-opacity": 0.35 } });
-  m.addLayer({ id: "v-country-line", type: "line", source: "v-countries", paint: { "line-color": cc, "line-width": 1, "line-opacity": 0.85 } });
+  m.addLayer({ id: "v-country-fill", type: "fill", source: "v-countries", paint: { "fill-color": cc, "fill-opacity": 0.08 } });
+  m.addLayer({ id: "v-country-glow", type: "line", source: "v-countries", paint: { "line-color": cc, "line-width": 4, "line-blur": 4, "line-opacity": 0.14 } });
+  m.addLayer({ id: "v-country-line", type: "line", source: "v-countries", paint: { "line-color": cc, "line-width": 0.7, "line-opacity": 0.4 } });
   m.addSource("v-clouds", { type: "image", url: CLOUDS_IMG, coordinates: [[-180, 85.05], [180, 85.05], [180, -85.05], [-180, -85.05]] });
   m.addLayer({ id: "v-clouds", type: "raster", source: "v-clouds", layout: { visibility: "none" }, paint: { "raster-fade-duration": 0 } });
   Object.assign(video, { vmap: m, vmapKey: key, nightAt: null, lightsAt: null });
@@ -7676,8 +7682,11 @@ function drawVideoFrame(ctx, W, H, plan, t) {
     // the atmosphere: a glow around the globe's visible edge (seen in perspective from 1.5 frame heights, the edge is
     // nearer the centre than R)
     const cam = 1.5 * H, edge = R * cam / Math.sqrt((cam + R) ** 2 - R * R);
-    ctx.save();
-    ctx.shadowColor = pal().halo; ctx.shadowBlur = 60;
+    ctx.save();  // the atmosphere: a wide soft halo, then a thin bright rim
+    const atm = ctx.createRadialGradient(cx, cy, edge * 0.92, cx, cy, edge * 1.22);
+    atm.addColorStop(0, hexA(isHex(pal().atmosphere) ? pal().atmosphere : "#7c4dff", 0.42)); atm.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = atm; ctx.beginPath(); ctx.arc(cx, cy, edge * 1.22, 0, 2 * Math.PI); ctx.fill();
+    ctx.shadowColor = pal().halo; ctx.shadowBlur = 40;
     ctx.beginPath(); ctx.arc(cx, cy, edge * 0.99, 0, 2 * Math.PI); ctx.fillStyle = pal().bg[2]; ctx.fill();
     ctx.restore();
     ctx.drawImage(m.getCanvas(), 0, 0, W, H);
@@ -7698,6 +7707,7 @@ function drawVideoFrame(ctx, W, H, plan, t) {
     // orthographic: a point at height h (globe radii) sits (1 + h) times further from the globe's centre on screen
     project = (p, h = 0) => { const [x, y] = proj(p); return [W / 2 + (x - W / 2) * (1 + h), cy + (y - cy) * (1 + h)]; };
   }
+  drawFilmFinish(ctx, W, H);
   drawVideoOverlay(ctx, W, H, plan, t, st, project, onFront);
   const credit = plan.tiled && vmInfo(plan.mapKey).credit;  // the map's credit, small, bottom right
   if (credit) {
@@ -7707,14 +7717,33 @@ function drawVideoFrame(ctx, W, H, plan, t) {
   }
 }
 
+// over the map, under the routes and text: a soft vignette at the edges and a very fine film grain (a fixed noise tile,
+// shifted each frame so it shimmers like film rather than sitting still)
+function drawFilmFinish(ctx, W, H) {
+  const P = pal(), v = ctx.createRadialGradient(W / 2, H * 0.45, Math.min(W, H) * 0.35, W / 2, H * 0.45, Math.max(W, H) * 0.75);
+  v.addColorStop(0, `rgba(${P.shade},0)`); v.addColorStop(1, `rgba(${P.shade},0.55)`);
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+  if (!video.grain) {
+    const c = el("canvas", { width: 160, height: 160 }), g = c.getContext("2d"), d = g.createImageData(160, 160);
+    for (let i = 0; i < d.data.length; i += 4) { const n = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = n; d.data[i + 3] = 255; }
+    g.putImageData(d, 0, 0); video.grain = c;
+  }
+  ctx.save(); ctx.globalAlpha = 0.045; ctx.globalCompositeOperation = "overlay";
+  const ox = Math.floor(Math.random() * 160), oy = Math.floor(Math.random() * 160);
+  ctx.fillStyle = ctx.createPattern(video.grain, "repeat"); ctx.translate(-ox, -oy); ctx.fillRect(0, 0, W + ox, H + oy);
+  ctx.restore();
+}
 // space behind the globe: the theme's dark gradient and a field of stars
 function drawSpace(ctx, W, H) {
   const P = pal(), bg = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(W, H) * 0.75);
   bg.addColorStop(0, P.space); bg.addColorStop(1, P.bg[2]);
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-  if (!video.stars.length) for (let i = 0; i < 160; i++) video.stars.push([Math.random(), Math.random(), Math.random() * 1.3 + 0.2]);
-  ctx.fillStyle = "rgba(255,255,255,0.55)";
-  for (const [x, y, r] of video.stars) { ctx.beginPath(); ctx.arc(x * W, y * H, r, 0, 2 * Math.PI); ctx.fill(); }
+  if (!video.stars.length) for (let i = 0; i < 220; i++) video.stars.push([Math.random(), Math.random(), Math.random() * 1.3 + 0.2, Math.random() * 6.28]);
+  const now = performance.now() / 1000, drift = now * 0.004;  // the sky drifts very slowly, the far stars slower (parallax)
+  for (const [x, y, r, ph] of video.stars) {
+    const sx = ((x + drift * (0.4 + r)) % 1) * W, tw = 0.35 + 0.35 * (0.5 + 0.5 * Math.sin(now * 1.7 + ph));
+    ctx.fillStyle = `rgba(255,255,255,${tw.toFixed(3)})`; ctx.beginPath(); ctx.arc(sx, y * H, r, 0, 2 * Math.PI); ctx.fill();
+  }
 }
 function drawStylisedGlobe(ctx, W, H, proj, R, utc, cy = H / 2) {
   const path = d3.geoPath(proj, ctx), P = pal();
@@ -7750,7 +7779,7 @@ function drawVideoOverlay(ctx, W, H, plan, t, st, project, onFront) {
     ctx.beginPath(); let pen = false;
     for (const u of us) {
       const c = leg.interp(u), h = leg.alt(u);
-      if (!onFront(c, h)) { pen = false; continue; }
+      if (!onFront(c, 0)) { pen = false; continue; }  // only over the visible side: past the globe's edge an arc folds back into a loop
       const [x, y] = project(c, h);
       pen ? ctx.lineTo(x, y) : ctx.moveTo(x, y); pen = true;
     }
@@ -7769,6 +7798,15 @@ function drawVideoOverlay(ctx, W, H, plan, t, st, project, onFront) {
       const [ax, ay] = project(leg.interp(0)), [bx, by] = project(leg.interp(1));
       g = ctx.createLinearGradient(ax, ay, bx, by);
       for (let i = 0; i <= 12; i++) g.addColorStop(i / 12, flowColour(i / 12 - t * 0.11, P));
+    }
+    // the opening: every flight of the trip lit up at once, fading as the camera dives to the first take-off
+    const pre = st.intro ? 1 - smooth(plan.intro * 0.5, plan.intro * 0.9, t) : 0;
+    if (pre > 0) {
+      strokeRoute(leg, d3.range(0, 1.0001, 0.01));
+      ctx.save(); ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = g;
+      ctx.globalAlpha = pre * 0.3; ctx.lineWidth = lineW * 3; ctx.shadowColor = routeColour(leg) || P.holo[1]; ctx.shadowBlur = 12 * U; ctx.stroke();
+      ctx.shadowBlur = 0; ctx.globalAlpha = pre; ctx.lineWidth = lineW * 1.1; ctx.stroke();
+      ctx.restore();
     }
     // still to fly: dotted
     if (k < 1) {
@@ -7796,17 +7834,6 @@ function drawVideoOverlay(ctx, W, H, plan, t, st, project, onFront) {
       }
       ctx.restore();
     }
-    // contrail behind the plane: in the route's colours, widening and fading towards the tail
-    if (t >= leg.start && t < leg.end && k > 0 && leg.alt(k) > 0) {
-      const trail = Math.min(k, 0.4 * st.km / Math.max(leg.f.km, 1)), N = 28;
-      ctx.save(); ctx.lineCap = "butt"; ctx.strokeStyle = g; ctx.shadowColor = routeColour(leg) || P.holo[1]; ctx.shadowBlur = 6 * U;
-      for (let j = 0; j < N; j++) {
-        const u0 = k - trail * (1 - j / N), u1 = k - trail * (1 - (j + 1) / N), s = (j + 1) / N;
-        strokeRoute(leg, [u0, (u0 + u1) / 2, u1]);
-        ctx.globalAlpha = 0.9 * s * s; ctx.lineWidth = lineW * (2.4 - 1.4 * s); ctx.stroke();
-      }
-      ctx.restore();
-    }
     flownKm += leg.f.km * k;
     flownFuel += (leg.f.fuel || 0) * k;
     flownMin += (leg.f.min || 0) * k;
@@ -7822,7 +7849,7 @@ function drawVideoOverlay(ctx, W, H, plan, t, st, project, onFront) {
     const p = [AP[code].lon, AP[code].lat];
     if (!onFront(p)) continue;
     const [x, y] = project(p);
-    const on = reached.has(code) || (code === st.leg.f.to && st.phase === "arr");
+    const on = reached.has(code) || (code === st.leg.f.to && st.phase === "arr") || (st.intro && t < plan.intro * 0.5);
     const halo = ctx.createRadialGradient(x, y, 0, x, y, (on ? 22 : 14) * U);  // a soft glow around the airport
     const hc = colourOf(style.color) && !style.gradient && !style.ramp ? colourOf(style.color) : P.holo[0];
     halo.addColorStop(0, hexA(isHex(hc) ? hc : "#00e5ff", on ? 0.55 : 0.3)); halo.addColorStop(1, "rgba(0,0,0,0)");
@@ -7830,23 +7857,42 @@ function drawVideoOverlay(ctx, W, H, plan, t, st, project, onFront) {
     ctx.beginPath(); ctx.arc(x, y, (on ? 6 : 4) * U, 0, 2 * Math.PI);
     ctx.fillStyle = on ? "#ffffff" : "rgba(255,255,255,0.6)"; ctx.fill();
     ctx.lineWidth = 2 * U; ctx.strokeStyle = P.ring; ctx.stroke();
-    if (!on) continue;
+    // the trip's destination once it has landed: a ring pulsing out from it
+    if (st.phase === "done" && code === plan.legs[plan.legs.length - 1].f.to) {
+      const ph = (performance.now() / 1400) % 1;
+      ctx.save(); ctx.globalAlpha = 0.8 * (1 - ph); ctx.strokeStyle = hc && isHex(hc) ? hc : "#ffffff"; ctx.lineWidth = 2.5 * U;
+      ctx.beginPath(); ctx.arc(x, y, (8 + 26 * ph) * U, 0, 7); ctx.stroke(); ctx.restore();
+    }
+    if (!on || st.intro && t < plan.intro * 0.5 && !reached.has(code)) continue;
+    // a baggage tag: the airport code large, the city with its flag below, a punched hole on the tag's pointed end
     const big = priority.includes(code);
     const city = `${AP[code].city} ${flagOf(code)}`.trim(), country = AP[code].country || "";
-    const f1 = big ? 26 : 18, f2 = big ? 15 : 12;
-    ctx.font = sans(700, f1);
-    const w1 = ctx.measureText(city).width;
+    const f1 = big ? TS.l : TS.m, f2 = TS.s, hole = (big ? 16 : 12) * U;
+    ctx.font = sans(800, f1);
+    const w1 = ctx.measureText(code).width;
     ctx.font = sans(600, f2);
-    const tw = Math.max(w1, ctx.measureText(country).width) + 22 * U, th = (f1 + f2 + 18) * U;
+    const tw = Math.max(w1, ctx.measureText(city).width) + 22 * U + hole, th = (f1 + f2 + 18) * U;
     const left = x + 14 * U + tw > W - L.side;
     const box = { x: left ? x - 14 * U - tw : x + 14 * U, y: y - th / 2, w: tw, h: th };
     // keep clear of the flight panel, the title and the frame edges (in portrait: the stories' safe zone)
     if (box.y + box.h > panel.y - 8 * U || box.y < L.titleBottom + 8 * U || box.x < L.side || box.x + box.w > W - L.side) continue;
     if (placed.some(b => box.x < b.x + b.w && b.x < box.x + box.w && box.y < b.y + b.h && b.y < box.y + box.h)) continue;
     placed.push(box);
-    ctx.fillStyle = P.label; roundRect(ctx, box.x, box.y, box.w, box.h, 10 * U); ctx.fill();
-    ctx.fillStyle = "#ffffff"; ctx.font = sans(700, f1); ctx.fillText(city, box.x + 11 * U, box.y + (f1 + 6) * U);
-    ctx.fillStyle = "rgba(255,255,255,0.75)"; ctx.font = sans(600, f2); ctx.fillText(country, box.x + 11 * U, box.y + (f1 + f2 + 10) * U);
+    // the tag's outline: square at the far end, the near end (towards the airport) cut to a point, with the hole there
+    const near = left ? box.x + box.w : box.x, far = left ? box.x : box.x + box.w, dir = left ? -1 : 1, cut = Math.min(14 * U, box.h / 2), rr = 8 * U;
+    ctx.beginPath();
+    ctx.moveTo(near, box.y + box.h / 2);
+    ctx.lineTo(near + dir * cut, box.y); ctx.lineTo(far - dir * rr, box.y);
+    ctx.quadraticCurveTo(far, box.y, far, box.y + rr); ctx.lineTo(far, box.y + box.h - rr);
+    ctx.quadraticCurveTo(far, box.y + box.h, far - dir * rr, box.y + box.h); ctx.lineTo(near + dir * cut, box.y + box.h); ctx.closePath();
+    ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.35)"; ctx.shadowBlur = 10 * U; ctx.fillStyle = P.label; ctx.fill(); ctx.restore();
+    ctx.strokeStyle = "rgba(255,255,255,0.14)"; ctx.lineWidth = 1 * U; ctx.stroke();
+    const hx = near + dir * (cut + 4 * U), hy = box.y + box.h / 2;
+    ctx.beginPath(); ctx.arc(hx, hy, 3.4 * U, 0, 7); ctx.fillStyle = `rgba(${P.shade},1)`; ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.45)"; ctx.lineWidth = 1.2 * U; ctx.stroke();
+    const tx = left ? box.x + 11 * U : box.x + hole + 14 * U;
+    ctx.fillStyle = "#ffffff"; ctx.font = sans(800, f1); ctx.fillText(code, tx, box.y + (f1 + 4) * U);
+    ctx.fillStyle = "rgba(255,255,255,0.78)"; ctx.font = sans(600, f2); ctx.fillText(city, tx, box.y + (f1 + f2 + 9) * U);
   }
 
   // the aircraft up on its arc, heading along the route, with its shadow on the ground; to scale for its type,
@@ -7861,26 +7907,37 @@ function drawVideoOverlay(ctx, W, H, plan, t, st, project, onFront) {
       const [gx, gy] = project(p), heading = Math.atan2(yb - ya, xb - xa);
       const close = 1 - Math.min(1, Math.log(st.km / Math.min(leg.kmFrom, leg.kmTo)) / Math.log(20));
       // true to scale between types: an A380 is 3.7 times the length of a Saab 340 (45 m keeps the usual size)
-      const size = (46 + 34 * close) * U * (0.7 + 0.45 * arcShape(u)) * spec.len / 45;
+      const size = (52 + 38 * close) * U * (0.7 + 0.45 * arcShape(u)) * spec.len / 45;
       // bank into turns: how fast the heading on screen is changing just ahead, up to about 30°
       const u3 = Math.min(1, u + 0.02), q3 = leg.interp(u3), [x3, y3] = project(q3, leg.alt(u3));
       const turn = ((Math.atan2(y3 - yb, x3 - xb) - heading + 3 * Math.PI) % (2 * Math.PI)) - Math.PI;
       const roll = h > 0 ? Math.max(-0.52, Math.min(0.52, turn * 6)) * Math.min(1, u * 12, (1 - u) * 12) : 0;  // level on the ground, at take-off and landing
       const fin = tailColour(leg.f.airline);
-      if (typeof ctx.filter === "string" && h > 0) {
-        ctx.save(); ctx.filter = "brightness(0)"; ctx.globalAlpha = 0.35;
+      if (typeof ctx.filter === "string" && h > 0) {  // its shadow on the ground, soft
+        ctx.save(); ctx.filter = `brightness(0) blur(${Math.max(1, 2.5 * U)}px)`; ctx.globalAlpha = 0.4;
         drawAircraft(ctx, gx, gy, heading, size * 0.85, type, roll);
         ctx.restore();
       }
       drawAircraft(ctx, x, y, heading, size, type, roll, fin);
+      if (plan.night && st.utc != null && h > 0) {  // navigation lights: red on the left wingtip, green on the right, softly blinking
+        const span = size * 0.46, bx = x - Math.cos(heading) * size * 0.08, byy = y - Math.sin(heading) * size * 0.08, blink = 0.6 + 0.4 * Math.sin(performance.now() / 260);
+        for (const [side, col] of [[-1, "255,64,64"], [1, "64,255,140"]]) {
+          const wx = bx + Math.cos(heading + side * Math.PI / 2) * span, wy = byy + Math.sin(heading + side * Math.PI / 2) * span;
+          const glow = ctx.createRadialGradient(wx, wy, 0, wx, wy, 7 * U);
+          glow.addColorStop(0, `rgba(${col},${0.9 * blink})`); glow.addColorStop(1, `rgba(${col},0)`);
+          ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(wx, wy, 7 * U, 0, 7); ctx.fill();
+        }
+      }
     }
   }
 
-  // the head-up display: title and brand mark, stat chips (dates, distance and time flown so far, flight n of m), the
+  // the head-up display: title, stat chips (dates, distance and time flown so far, flight n of m), the
   // phase as a coloured status pill, and the whole journey as a progress line with its stops
   drawVideoHud(ctx, W, U, L, P, plan, st, flownKm, flownMin, flownFuel, sans);
 
-  if (video.cards) drawStoryCards(ctx, W, H, U, panel, plan, st, t, sans);
+  const sum = smooth(plan.outroStart, plan.outroStart + 0.45, t);  // the cards give way to the trip's summary
+  if (video.cards && sum < 1) { ctx.save(); ctx.globalAlpha = 1 - sum; drawStoryCards(ctx, W, H, U, panel, plan, st, t, sans); ctx.restore(); }
+  if (sum > 0) drawTripSummary(ctx, W, L, plan, t, sum, sans);
 }
 
 const TONES = { blue: "#3b82f6", violet: "#8b5cf6", green: "#10b981", amber: "#f59e0b", pink: "#ec4899", red: "#ef4444" };  // as .tone-* in the CSS
@@ -7892,12 +7949,25 @@ function drawVideoHud(ctx, W, U, L, P, plan, st, flownKm, flownMin, flownFuel, s
   ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
   // title
   ctx.shadowColor = "rgba(0,0,0,0.35)"; ctx.shadowBlur = 10 * U;
-  ctx.font = sora(700, 12); ctx.fillStyle = "rgba(255,255,255,0.78)";
+  ctx.font = sora(700, TS.s); ctx.fillStyle = "rgba(255,255,255,0.78)";
   if ("letterSpacing" in ctx) ctx.letterSpacing = `${1.7 * U}px`;
   ctx.fillText(video.kicker.toUpperCase(), pad, ty + 10 * U, right - pad);
   if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
-  ctx.font = sora(800, 30); ctx.fillStyle = "#ffffff";
-  ctx.fillText(video.title, pad, ty + 42 * U, right - pad);
+  // the title, as large as fits: "City → City" with the arrow drawn as a dashed flight path and a plane, like the logo
+  const parts = video.title.split(" → "), gapW = 54 * U;
+  let tpx = TS.xl;
+  const titleW = px => { ctx.font = sora(800, px); return parts.length === 2 ? ctx.measureText(parts[0]).width + gapW + ctx.measureText(parts[1]).width : ctx.measureText(video.title).width; };
+  while (tpx > TS.l && titleW(tpx) > right - pad) tpx -= 1;
+  ctx.font = sora(800, tpx); ctx.fillStyle = "#ffffff";
+  const tyT = ty + 44 * U;
+  if (parts.length === 2) {
+    const w0 = ctx.measureText(parts[0]).width, mid = tyT - tpx * U * 0.32;
+    ctx.fillText(parts[0], pad, tyT);
+    ctx.save(); ctx.shadowColor = "transparent"; ctx.strokeStyle = "rgba(255,255,255,0.55)"; ctx.lineWidth = 2 * U; ctx.setLineDash([4 * U, 4 * U]);
+    ctx.beginPath(); ctx.moveTo(pad + w0 + 10 * U, mid); ctx.lineTo(pad + w0 + gapW - 22 * U, mid); ctx.stroke(); ctx.restore();
+    if (PLANE_PATH) { const k = 18 * U / 24; ctx.save(); ctx.translate(pad + w0 + gapW - 14 * U, mid); ctx.rotate(Math.PI / 2); ctx.scale(k, k); ctx.translate(-12, -12); ctx.fill(PLANE_PATH); ctx.restore(); }
+    ctx.fillText(parts[1], pad + w0 + gapW, tyT);
+  } else ctx.fillText(video.title, pad, tyT, right - pad);
   ctx.shadowColor = "transparent";
   // stat chips: the trip's figures, in the colours they have on the page; a value counts up as the trip goes
   const toRgb = c => c.startsWith("#") ? rgb(c) : [255, 255, 255];
@@ -7916,14 +7986,14 @@ function drawVideoHud(ctx, W, U, L, P, plan, st, flownKm, flownMin, flownFuel, s
   // sizeFor: the widest the value gets, so the chip keeps its size; cell: a grid cell's width (the chip fills it)
   const chip = (x, y, h, name, text, sizeFor, tone, cell = 0) => {
     const [tr, tg, tb] = toRgb(TONES[tone] || P.accent), mix = v => Math.round(v * 0.62 + 255 * 0.38);
-    ctx.font = sans(600, 13);
+    ctx.font = sans(600, TS.m);
     const w = cell || 10 * U + 14 * U + 7 * U + Math.max(ctx.measureText(text).width, ctx.measureText(sizeFor).width) + 11 * U;
     roundRect(ctx, x, y, w, h, cell ? 7 * U : h / 2);
     ctx.fillStyle = `rgba(${P.shade},0.5)`; ctx.fill();  // over the bright maps too
     ctx.fillStyle = `rgba(${tr},${tg},${tb},0.2)`; ctx.fill();
     ctx.strokeStyle = `rgba(${tr},${tg},${tb},0.5)`; ctx.lineWidth = 1 * U; ctx.stroke();
     icon(name, x + 10 * U + 7 * U, y + h / 2, 13 * U, `rgb(${mix(tr)},${mix(tg)},${mix(tb)})`);
-    ctx.fillStyle = "#ffffff"; ctx.fillText(text, x + 31 * U, y + h / 2 + 4.5 * U);
+    ctx.fillStyle = "#ffffff"; ctx.fillText(text, x + 31 * U, y + h / 2 + 5.5 * U);
     return w;
   };
   const i = plan.legs.indexOf(st.leg), n = plan.legs.length, landed = i === n - 1 && st.k >= 1;
@@ -7934,48 +8004,66 @@ function drawVideoHud(ctx, W, U, L, P, plan, st, flownKm, flownMin, flownFuel, s
   const tight = m => span(m).replace(/ d\b/, "d").replace(/ h$/, "h");
   const live = { plane: `Flight ${i + 1} / ${n}`, route: `${fmt(flownKm)} km`, clock: tight(flownMin),
                  total: tight(flownMin + passed), fuel: `${fmt(flownFuel)} L`, leaf: `${fmt(sofar("co2"))} kg CO₂` };
-  // the same figures as the trip on the page, which they reach once it has landed
-  const chips = tripFactList(video.flights, true).filter(([name]) => name !== "plane" || n > 1)
+  // three figures while it plays (flight n of m, distance and time flown; for one flight, CO₂ in place of the count),
+  // the same as the trip on the page, which they reach once it has landed; the rest is in the summary at the end
+  const keep = n > 1 ? ["plane", "route", "clock"] : ["route", "clock", "leaf"];
+  const chips = tripFactList(video.flights, true).filter(([name]) => keep.includes(name))
     .map(([name, tone, text]) => [name, landed ? text : live[name], name === "plane" ? `Flight ${n} / ${n}` : text, tone]);
-  // the narrow frames (9:16, square): a grid of 3 columns and 2 rows, as on the photos
-  const cellW = (right - pad - 2 * 6 * U) / 3;
-  if (L.chipRows) chips.slice(0, 6).forEach(([name, text, sizeFor, tone], j) =>
-    chip(pad + (j % 3) * (cellW + 6 * U), ty + (54 + Math.floor(j / 3) * 30) * U, 24 * U, name, text, sizeFor, tone, cellW));
+  // the narrow frames (9:16, square): one frosted panel, the figures in white in 3 columns, a small icon each, faint lines between them
+  if (L.chipRows) {
+    const shown = chips.slice(0, 3), rows = 1, cellW = (right - pad) / 3, py0 = ty + 54 * U, rowH = 34 * U;
+    ctx.save();
+    roundRect(ctx, pad, py0, right - pad, rows * rowH + 4 * U, 12 * U);
+    ctx.fillStyle = `rgba(${P.shade},0.55)`; ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.05)"; ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.12)"; ctx.lineWidth = 1 * U; ctx.stroke();
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    for (let c = 1; c < 3; c++) { ctx.beginPath(); ctx.moveTo(pad + c * cellW, py0 + 7 * U); ctx.lineTo(pad + c * cellW, py0 + rows * rowH - 3 * U); ctx.stroke(); }
+    if (rows > 1) { ctx.beginPath(); ctx.moveTo(pad + 10 * U, py0 + rowH + 2 * U); ctx.lineTo(right - 10 * U, py0 + rowH + 2 * U); ctx.stroke(); }
+    shown.forEach(([name, text], j) => {
+      const x = pad + (j % 3) * cellW, y = py0 + Math.floor(j / 3) * rowH + rowH / 2 + 2 * U;
+      icon(name, x + 16 * U, y, 13 * U, "rgba(255,255,255,0.6)");
+      ctx.font = sans(700, TS.m); ctx.fillStyle = "#ffffff";
+      ctx.fillText(text, x + 30 * U, y + 5.5 * U, cellW - 36 * U);
+    });
+    ctx.restore();
+  }
   // 16:9: one row, as many as fit (the last ones are the least important)
   let cx = pad, row = 0;
-  ctx.font = sans(600, 13);
+  ctx.font = sans(600, TS.m);
   for (const [name, text, sizeFor, tone] of L.chipRows ? [] : chips) {
     const need = 10 * U + 14 * U + 7 * U + Math.max(ctx.measureText(text).width, ctx.measureText(sizeFor).width) + 11 * U;
     if (cx + need > right) { if (row || !L.chipRows) break; row = 1; cx = pad; }
-    cx += chip(cx, ty + (54 + row * 30) * U, 24 * U, name, text, sizeFor, tone) + 6 * U;
-    ctx.font = sans(600, 13);
+    cx += chip(cx, ty + (54 + row * 30) * U, 28 * U, name, text, sizeFor, tone) + 6 * U;
+    ctx.font = sans(600, TS.m);
   }
   // status pill: a coloured dot, the phase in capitals, then what it means now
   const f = st.leg.f, H = P.holo;
   const lay = st.phase === "dep" && i > 0 ? layoverMin(plan.legs[i - 1], st.leg) : null;
-  const totalKm = plan.legs.reduce((s, l) => s + l.f.km, 0);
-  const [label, colour, detail] = st.phase === "done" ? ["COMPLETE", "#4ade80", `${plan.legs.length} flight${plan.legs.length > 1 ? "s" : ""} · ${fmt(totalKm)} km`]
+  // what the figures don't say: where you are, where you're heading and how long is left of this flight
+  const lastTo = plan.legs[plan.legs.length - 1].f.to, toGo = g => `${g.min ? `${hm(Math.round(g.min * (1 - (g === f ? st.k : 0)))) || "0:00"} h to ` : "to "}${AP[g.to].city} ${flagOf(g.to)}`;
+  const [label, colour, detail] = st.phase === "done" ? ["COMPLETE", "#4ade80", `Landed in ${AP[lastTo].city} ${flagOf(lastTo)}`]
     : st.phase === "dep" ? ["DEPARTING", P.accent, `${AP[f.from].city} ${flagOf(f.from)}${lay > 0 ? ` · ${span(lay)} layover` : ""}`]
     : st.phase === "arr" ? ["ARRIVING", H[2] || P.accent, `${AP[f.to].city} ${flagOf(f.to)}`]
-    : ["CRUISING", H[1] || P.accent, `${fmt(f.km * (1 - st.k))} km${f.min ? ` · ${hm(Math.round(f.min * (1 - st.k))) || "0:00"} h` : ""} to go`];
-  const py = ty + (86 + L.chipRows * 30) * U, ph = 26 * U;
+    : ["CRUISING", H[1] || P.accent, toGo(f)];
+  const py = ty + (L.chipRows ? 96 : 90) * U, ph = 28 * U;
   // one width for the whole video – the longest status the trip will show – so the journey line beside it never moves;
   // only past 60% of the frame does a detail end with …
   if (!plan.pillW || plan.pillU !== U) {
-    const texts = [["COMPLETE", `${plan.legs.length} flight${plan.legs.length > 1 ? "s" : ""} · ${fmt(totalKm)} km`]];
+    const texts = [["COMPLETE", `Landed in ${AP[lastTo].city} ${flagOf(lastTo)}`]];
     plan.legs.forEach((l, j) => {
       const lj = j > 0 ? layoverMin(plan.legs[j - 1], l) : null, g = l.f;
       texts.push(["DEPARTING", `${AP[g.from].city} ${flagOf(g.from)}${lj > 0 ? ` · ${span(lj)} layover` : ""}`],
                  ["ARRIVING", `${AP[g.to].city} ${flagOf(g.to)}`],
-                 ["CRUISING", `${fmt(g.km)} km${g.min ? ` · ${hm(g.min)} h` : ""} to go`]);
+                 ["CRUISING", `${g.min ? `${hm(g.min)} h to ` : "to "}${AP[g.to].city} ${flagOf(g.to)}`]);
     });
-    plan.pillW = Math.max(...texts.map(([a, b]) => { ctx.font = sans(800, 12); const w1 = ctx.measureText(a).width;
-                                                     ctx.font = sans(600, 15); return 32 * U + w1 + 16 * U + ctx.measureText(b).width + 16 * U; }));
+    plan.pillW = Math.max(...texts.map(([a, b]) => { ctx.font = sans(800, TS.s); const w1 = ctx.measureText(a).width;
+                                                     ctx.font = sans(600, TS.m); return 32 * U + w1 + 16 * U + ctx.measureText(b).width + 16 * U; }));
     plan.pillU = U;
   }
   const pw = Math.min(plan.pillW, (right - pad) * 0.6);
-  ctx.font = sans(800, 12); const lw = ctx.measureText(label).width;
-  ctx.font = sans(600, 15);
+  ctx.font = sans(800, TS.s); const lw = ctx.measureText(label).width;
+  ctx.font = sans(600, TS.m);
   let shown = detail.trim();
   const room = pw - (32 * U + lw + 16 * U + 14 * U);
   while (shown.length > 1 && ctx.measureText(shown).width > room) shown = shown.slice(0, -2) + "…";
@@ -7984,11 +8072,11 @@ function drawVideoHud(ctx, W, U, L, P, plan, st, flownKm, flownMin, flownFuel, s
   ctx.strokeStyle = `rgba(${cr},${cg},${cb},0.55)`; ctx.lineWidth = 1.2 * U; ctx.stroke();
   const pulse = 0.55 + 0.45 * Math.abs(Math.sin(performance.now() / 380));
   ctx.fillStyle = colour; ctx.globalAlpha = pulse; ctx.beginPath(); ctx.arc(pad + 14 * U + 5 * U, py + ph / 2, 5 * U, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
-  ctx.font = sans(800, 12); ctx.fillStyle = `rgb(${[cr, cg, cb].map(v => Math.round(v + (255 - v) * 0.5)).join(",")})`;  // lighter, readable on the pill
+  ctx.font = sans(800, TS.s); ctx.fillStyle = `rgb(${[cr, cg, cb].map(v => Math.round(v + (255 - v) * 0.5)).join(",")})`;  // lighter, readable on the pill
   if ("letterSpacing" in ctx) ctx.letterSpacing = `${1.2 * U}px`;
   ctx.fillText(label, pad + 32 * U, py + ph / 2 + 4.5 * U);
   if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
-  ctx.font = sans(600, 15); ctx.fillStyle = "#ffffff"; ctx.fillText(shown, pad + 32 * U + lw + 16 * U, py + ph / 2 + 5 * U);
+  ctx.font = sans(600, TS.m); ctx.fillStyle = "#ffffff"; ctx.fillText(shown, pad + 32 * U + lw + 16 * U, py + ph / 2 + 5.5 * U);
   // journey progress: the trip as on the page, to scale in time with the layovers dotted, a dot per stop (filled once
   // reached), the plane where you are now; on its own row in 9:16, beside the status otherwise
   const x0 = L.lineRow ? pad : pad + pw + 22 * U, x1 = L.lineRow ? right : Math.min(right - 14 * U, x0 + 560 * U), by = L.lineRow ? py + ph + 20 * U : py + ph / 2 - 3 * U;
@@ -8000,8 +8088,8 @@ function drawVideoHud(ctx, W, U, L, P, plan, st, flownKm, flownMin, flownFuel, s
     ctx.lineCap = "round";
     plan.legs.forEach((l, j) => {
       const a = stops[j].u1, b = stops[j + 1].u0;
-      ctx.lineWidth = 3 * U; stroke(a, b, "rgba(255,255,255,0.18)");
-      if (at > a) stroke(a, Math.min(at, b), g);
+      ctx.lineWidth = 5 * U; stroke(a, b, "rgba(255,255,255,0.16)");
+      if (at > a) { ctx.save(); ctx.shadowColor = H[1] || P.accent; ctx.shadowBlur = 10 * U; stroke(a, Math.min(at, b), g); ctx.restore(); }
     });
     ctx.lineWidth = 2.4 * U; ctx.setLineDash([0, 7 * U]);
     stops.forEach(s => { if (s.u1 > s.u0) stroke(s.u0, s.u1, at >= s.u1 ? "#ffffff" : "rgba(255,255,255,0.55)"); });
@@ -8011,16 +8099,23 @@ function drawVideoHud(ctx, W, U, L, P, plan, st, flownKm, flownMin, flownFuel, s
     stops.forEach((s, k) => {
       for (const u of s.u1 > s.u0 ? [s.u0, s.u1] : [s.u0]) {
         const reached = at >= u - 1e-6;
-        ctx.beginPath(); ctx.arc(X(u), by, 4.5 * U, 0, 7);
+        ctx.beginPath(); ctx.arc(X(u), by, 6 * U, 0, 7);
         ctx.fillStyle = reached ? "#ffffff" : `rgba(${P.shade},1)`; ctx.fill();
-        ctx.strokeStyle = reached ? "#ffffff" : "rgba(255,255,255,0.5)"; ctx.lineWidth = 1.5 * U; ctx.stroke();
+        ctx.strokeStyle = reached ? "#ffffff" : "rgba(255,255,255,0.5)"; ctx.lineWidth = 1.8 * U; ctx.stroke();
       }
-      ctx.font = sans(700, 10); ctx.fillStyle = at >= s.u0 - 1e-6 ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.55)"; ctx.textAlign = "center";
-      ctx.fillText(s.code, mid(s), up.has(k) ? by - 10 * U : by + 18 * U); ctx.textAlign = "left";
+      // the stop you are at (or flying to): a soft ring pulsing round it
+      const here = st.phase === "done" ? k === stops.length - 1 : st.between ? k === i : k === i + 1 && st.phase === "arr" || k === i && st.phase === "dep";
+      if (here) {
+        const ph = (performance.now() / 1200) % 1;
+        ctx.save(); ctx.globalAlpha = 0.7 * (1 - ph); ctx.strokeStyle = H[0] || "#ffffff"; ctx.lineWidth = 2 * U;
+        ctx.beginPath(); ctx.arc(mid(s), by, (7 + 10 * ph) * U, 0, 7); ctx.stroke(); ctx.restore();
+      }
+      ctx.font = sans(800, TS.s); ctx.fillStyle = at >= s.u0 - 1e-6 ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.55)"; ctx.textAlign = "center";
+      ctx.fillText(s.code, mid(s), up.has(k) ? by - 12 * U : by + 22 * U); ctx.textAlign = "left";
     });
     if (st.phase !== "done" && PLANE_PATH) {
-      const k = 18 * U / 24; ctx.save(); ctx.translate(X(at), by); ctx.rotate(Math.PI / 2); ctx.scale(k, k); ctx.translate(-12, -12);
-      ctx.shadowColor = "rgba(0,0,0,0.5)"; ctx.shadowBlur = 4; ctx.fillStyle = "#ffffff"; ctx.fill(PLANE_PATH); ctx.restore();
+      const k = 24 * U / 24; ctx.save(); ctx.translate(X(at), by); ctx.rotate(Math.PI / 2); ctx.scale(k, k); ctx.translate(-12, -12);
+      ctx.shadowColor = H[1] || "rgba(0,0,0,0.5)"; ctx.shadowBlur = 10; ctx.fillStyle = "#ffffff"; ctx.fill(PLANE_PATH); ctx.restore();
     }
   }
 }
@@ -8054,30 +8149,34 @@ function drawCountryNames(ctx, W, L, st, project, onFront, sans) {
     if (box.x < L.side || box.x + box.w > W - L.side || box.y < L.titleBottom + 36 * U || box.y + box.h > L.panel.y - 8 * U) continue;
     if (boxes.some(b => box.x < b.x + b.w && b.x < box.x + box.w && box.y < b.y + b.h && b.y < box.y + box.h)) continue;
     boxes.push(box);
-    ctx.globalAlpha = Math.min(smooth(0.07, 0.14, r), 1 - smooth(1.1, 1.6, r));
-    ctx.lineWidth = 3 * U; ctx.strokeStyle = "rgba(0,0,0,0.5)"; ctx.strokeText(text, x, y);
-    ctx.fillStyle = "rgba(255,255,255,0.88)"; ctx.fillText(text, x, y);
+    ctx.globalAlpha = 0.45 * Math.min(smooth(0.07, 0.14, r), 1 - smooth(1.1, 1.6, r));  // quiet, so the route leads
+    ctx.lineWidth = 3 * U; ctx.strokeStyle = "rgba(0,0,0,0.4)"; ctx.strokeText(text, x, y);
+    ctx.fillStyle = "#ffffff"; ctx.fillText(text, x, y);
   }
   ctx.restore();
 }
 
-/* Frame layout. The 9:16 format is for Instagram and Facebook Stories (not Reels, which cover the bottom 35–40%).
-   Safe zone on a 1080×1920 story: the top 155 px (progress bar, profile picture, account name, close button), the
-   bottom 155 px (the "Send message" reply bar) and 65 px on each side can be covered. In 9:16 every text stays inside the safe zone (the flight cards sit right on its bottom edge), and the camera centres
-   the action in the band between the title and the cards (shift = pixels up). */
-const STORY_SAFE = { top: 155 / 1920, bottom: 155 / 1920, side: 65 / 1080 };  // shares of the height / width
+/* Frame layout. The 9:16 format is made for Instagram Reels (and works for Stories, which cover less). On a 1080×1920
+   reel Instagram lays its own things over the frame: the "Reels" header and camera at the top (~210 px), and the like /
+   comment / share buttons down the right side of the lower half (~150 px). The title stays below the header; the flight
+   card is centred, a little narrower than the frame so the buttons cover less of it, and sits 155 px above the bottom;
+   the camera centres the action in the band between the title and the card (shift = pixels up). */
+const REEL_SAFE = { top: 210 / 1920, bottom: 155 / 1920, side: 65 / 1080, buttons: 150 / 1080 };  // shares of the height / width
+// the video's type scale: four sizes (in layout units) for every text over the map
+const TS = { s: 13, m: 16, l: 22, xl: 34 };
 function videoLayout(W, H, legs) {
   const U = Math.min(W, H) / 720, portrait = H > W * 1.5;
-  const side = portrait ? W * STORY_SAFE.side : 34 * U;
-  const top = portrait ? H * STORY_SAFE.top : 34 * U, bottom = portrait ? H * (1 - STORY_SAFE.bottom) : H - 34 * U;
-  const chipRows = W / U < 1000 ? 1 : 0, lineRow = portrait;  // a second row of stat chips and, in 9:16, a row of its own for the journey line: the narrow frames need them
-  const titleBottom = top + (124 + chipRows * 30 + (lineRow ? 42 : 0)) * U;  // the head-up display: title, dates, stat chips, status pill and journey line
+  const side = portrait ? W * REEL_SAFE.side : 34 * U;
+  const top = portrait ? H * REEL_SAFE.top : 34 * U, bottom = portrait ? H * (1 - REEL_SAFE.bottom) : H - 34 * U;
+  const chipRows = W / U < 1000 ? 1 : 0, lineRow = portrait;  // the narrow frames: the figures in a frosted panel and, in 9:16, a row of its own for the journey line
+  const titleBottom = top + (128 + chipRows * 8 + (lineRow ? 42 : 0)) * U;  // the head-up display: title, dates, figures, status pill and journey line
   // a strip of boarding-pass cards along the bottom edge (+ room for the layover tag): one card the width of the safe
   // zone in portrait; in 16:9 and square the current card in the middle with its neighbours beside it
-  const cardH = video.cards ? 196 * U : 0, tag = video.cards && legs > 1 ? 20 * U : 0, cardW = portrait ? W - 2 * side : Math.min(W - 2 * side, 470 * U);
-  const panel = { x: side, y: bottom - cardH - tag, w: W - 2 * side, h: cardH + tag, cardY: bottom - cardH, cardH, cardW };
+  const cardH = video.cards ? 208 * U : 0, tag = video.cards && legs > 1 ? 20 * U : 0;
+  const cardW = portrait ? W - side - W * REEL_SAFE.buttons : Math.min(W - 2 * side, 470 * U);  // 9:16: a little narrower, for the buttons on the right
+  const panel = { x: portrait ? (W - cardW) / 2 : side, y: bottom - cardH - tag, w: portrait ? cardW : W - 2 * side, h: cardH + tag, cardY: bottom - cardH, cardH, cardW };
   const shift = portrait ? Math.max(0, H / 2 - (titleBottom + panel.y) / 2) : 0;
-  return { U, portrait, side, top, titleBottom, panel, shift, chipRows, lineRow };
+  return { U, portrait, side, top, bottom, titleBottom, panel, shift, chipRows, lineRow };
 }
 /* The flights as boarding-pass cards (like the map page's flight cards) joined side by side; the strip slides to
    the next flight around each connection, with the layover on the join */
@@ -8096,17 +8195,33 @@ function storyStripPosition(plan, t) {  // 0 = first card centred, 1 = second, .
   });
   return p;
 }
+// the cards' colours: dark like the map page in dark mode, or light ones (Cards: Light) with the theme's deeper colour for the progress
+function cardInks(plan) {
+  const C = pal();
+  return plan.lightCards ? { card: "rgba(255,255,255,0.96)", edge: "rgba(28,26,63,0.12)", ink: "#1c1a3f", muted: "rgba(28,26,63,0.62)",
+                             accent: C.ppRoute, dash: "rgba(28,26,63,0.25)", tear: "rgba(28,26,63,0.2)", done: "#16a34a", shadow: "rgba(0,0,0,0.3)" }
+                         : { card: C.card, edge: C.cardEdge, ink: "#ffffff", muted: C.muted, accent: C.accent, dash: C.dash,
+                             tear: "rgba(255,255,255,0.18)", done: "#86efac", shadow: "rgba(0,0,0,0.45)" };
+}
+// a boarding-pass outline (w × h, the tear-off notches at y = notch), as a path
+function passPath(ctx, w, h, notch, U) {
+  const r = 9 * U, rad = 18 * U;
+  ctx.beginPath();
+  ctx.moveTo(rad, 0); ctx.arcTo(w, 0, w, h, rad);
+  ctx.lineTo(w, notch - r); ctx.arc(w, notch, r, -Math.PI / 2, Math.PI / 2, true);
+  ctx.arcTo(w, h, 0, h, rad); ctx.arcTo(0, h, 0, 0, rad);
+  ctx.lineTo(0, notch + r); ctx.arc(0, notch, r, Math.PI / 2, -Math.PI / 2, true);
+  ctx.arcTo(0, 0, w, 0, rad); ctx.closePath();
+}
 function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
   const cw = P.cardW, ch = P.cardH, gap = 14 * U, y0 = P.cardY, pos = storyStripPosition(plan, t);
   // dark cards like the map page in dark mode, or light ones (Cards: Light) with the theme's deeper colour for the progress
-  const C = pal(), light = plan.lightCards;
-  const K = light ? { card: "rgba(255,255,255,0.96)", edge: "rgba(28,26,63,0.12)", ink: "#1c1a3f", muted: "rgba(28,26,63,0.62)",
-                      accent: C.ppRoute, dash: "rgba(28,26,63,0.25)", tear: "rgba(28,26,63,0.2)", done: "#16a34a", shadow: "rgba(0,0,0,0.3)" }
-                  : { card: C.card, edge: C.cardEdge, ink: "#ffffff", muted: C.muted, accent: C.accent, dash: C.dash,
-                      tear: "rgba(255,255,255,0.18)", done: "#86efac", shadow: "rgba(0,0,0,0.45)" };
+  const C = pal(), light = plan.lightCards, K = cardInks(plan);
   const ink = K.ink, muted = K.muted, accent = K.accent;
-  const notch = 130 * U, r = 9 * U, rad = 18 * U;
+  const notch = 130 * U, r = 9 * U;
   const x0 = P.x + (P.w - cw) / 2 - pos * (cw + gap);
+  const narrow = cw >= P.w - 1;  // 9:16: one card the width of the frame, neighbours only slide through
+  if (narrow) { ctx.save(); ctx.beginPath(); ctx.rect(P.x - 2 * U, y0 - 30 * U, P.w + 4 * U, ch + 60 * U); ctx.clip(); }
   plan.legs.forEach((leg, i) => {
     const x = x0 + i * (cw + gap);
     if (x > W || x + cw < 0) return;
@@ -8114,12 +8229,7 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
     ctx.save(); ctx.translate(x, y0);
     ctx.globalAlpha = 1 - Math.min(0.55, Math.abs(i - pos) * 0.55);  // the cards beside the current one are dimmed
     // card with a notch on each side at the tear-off line
-    ctx.beginPath();
-    ctx.moveTo(rad, 0); ctx.arcTo(cw, 0, cw, ch, rad);
-    ctx.lineTo(cw, notch - r); ctx.arc(cw, notch, r, -Math.PI / 2, Math.PI / 2, true);
-    ctx.arcTo(cw, ch, 0, ch, rad); ctx.arcTo(0, ch, 0, 0, rad);
-    ctx.lineTo(0, notch + r); ctx.arc(0, notch, r, Math.PI / 2, -Math.PI / 2, true);
-    ctx.arcTo(0, 0, cw, 0, rad); ctx.closePath();
+    passPath(ctx, cw, ch, notch, U);
     ctx.shadowColor = K.shadow; ctx.shadowBlur = 18 * U; ctx.shadowOffsetY = 4 * U;
     ctx.fillStyle = K.card; ctx.fill();
     ctx.shadowColor = "transparent";
@@ -8131,12 +8241,24 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
       const lh = 40 * U, lw = Math.min(124 * U, lh * logo.width / logo.height);
       ctx.drawImage(logo, hx, 11 * U, lw, lh); hx += lw + 16 * U;
     }
-    ctx.font = sans(800, 22); ctx.fillStyle = ink;
+    ctx.font = sans(800, TS.l); ctx.fillStyle = ink;
     ctx.fillText(f.flight_no || f.airline || "", hx, 39 * U, cw - hx - 150 * U);
-    ctx.textAlign = "right"; ctx.font = sans(600, 15); ctx.fillStyle = muted;
+    ctx.textAlign = "right"; ctx.font = sans(600, TS.m); ctx.fillStyle = muted;
     const dateTxt = niceDate(f.date, false);
     ctx.fillText(dateTxt, cw - 18 * U, 37 * U);
-    if (k >= 1) { const dw = ctx.measureText(dateTxt).width; ctx.font = sans(800, 18); ctx.fillStyle = K.done; ctx.fillText("✓", cw - 26 * U - dw, 37 * U); }
+    if (k >= 1) { const dw = ctx.measureText(dateTxt).width; ctx.font = sans(800, TS.m); ctx.fillStyle = K.done; ctx.fillText("✓", cw - 26 * U - dw, 37 * U); }
+    if (k >= 1 && t >= leg.end) {  // stamped on landing: it drops in from a little larger, then sits slightly crooked
+      const a = Math.min(1, (t - leg.end) / 0.35), sc = 1 + 0.5 * (1 - easeInOut(a)), rot = -0.2;
+      ctx.save(); ctx.translate(cw * 0.5, 98 * U); ctx.rotate(rot); ctx.scale(sc, sc); ctx.globalAlpha *= 0.85 * a;
+      ctx.strokeStyle = K.done; ctx.fillStyle = K.done; ctx.lineWidth = 2.4 * U;
+      roundRect(ctx, -62 * U, -19 * U, 124 * U, 38 * U, 8 * U); ctx.stroke();
+      roundRect(ctx, -57 * U, -14 * U, 114 * U, 28 * U, 5 * U); ctx.lineWidth = 1 * U; ctx.stroke();
+      ctx.font = sans(900, TS.m); ctx.textAlign = "center";
+      if ("letterSpacing" in ctx) ctx.letterSpacing = `${3 * U}px`;
+      ctx.fillText("LANDED", 2 * U, 6.5 * U);
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+      ctx.restore(); ctx.textAlign = "left";
+    }
     // route: big codes, flag + city, times; dotted line with the plane at the flight's progress
     const clip = (txt, w) => {  // cut with … to fit the width (in the current font)
       if (ctx.measureText(txt).width <= w) return txt;
@@ -8146,15 +8268,15 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
     const end = (code, time, right) => {
       const ax = right ? cw - 18 * U : 18 * U;
       ctx.textAlign = right ? "right" : "left";
-      ctx.font = sans(800, 34); ctx.fillStyle = ink; ctx.fillText(code, ax, 84 * U);
+      ctx.font = sans(800, TS.xl); ctx.fillStyle = ink; ctx.fillText(code, ax, 84 * U);
       const codeW = ctx.measureText(code).width;
-      ctx.font = sans(600, 15); ctx.fillText(clip(`${flagOf(code)} ${cityOf(code)}`.trim(), cw * 0.42), ax, 103 * U);
-      ctx.font = sans(700, 16); ctx.fillText(time || "", ax, 122 * U);
+      ctx.font = sans(600, TS.m); ctx.fillText(clip(`${flagOf(code)} ${cityOf(code)}`.trim(), cw * 0.42), ax, 103 * U);
+      ctx.font = sans(700, TS.m); ctx.fillText(time || "", ax, 122 * U);
       return codeW;
     };
     const wa = end(f.from, f.time, false), wb = end(f.to, [f.arr_time, dayTag(f)].filter(Boolean).join(" "), true);
     const lx0 = 18 * U + wa + 18 * U, lx1 = cw - 18 * U - wb - 18 * U, ly = 72 * U;
-    ctx.textAlign = "center"; ctx.font = sans(500, 14); ctx.fillStyle = muted;
+    ctx.textAlign = "center"; ctx.font = sans(500, TS.s); ctx.fillStyle = muted;
     ctx.fillText([f.min ? `${hm(f.min)} h` : "", f.km ? `${fmt(f.km)} km` : ""].filter(Boolean).join(" · "), (lx0 + lx1) / 2, 57 * U, lx1 - lx0);
     ctx.strokeStyle = K.dash; ctx.lineWidth = 2 * U; ctx.setLineDash([5 * U, 5 * U]);
     ctx.beginPath(); ctx.moveTo(lx0, ly); ctx.lineTo(lx1, ly); ctx.stroke(); ctx.setLineDash([]);
@@ -8174,8 +8296,11 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
     ctx.textAlign = "left";
     for (const [label, value, sub, share] of cols) {
       const w = (cw - 36 * U) * share;
-      ctx.font = sans(600, 11); ctx.fillStyle = muted; ctx.fillText(label, cx, notch + 21 * U);
-      ctx.font = sans(700, 16); ctx.fillStyle = ink;
+      ctx.font = sans(700, TS.s); ctx.fillStyle = muted;
+      if ("letterSpacing" in ctx) ctx.letterSpacing = `${0.8 * U}px`;
+      ctx.fillText(label, cx, notch + 22 * U);
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+      ctx.font = sans(700, TS.l); ctx.fillStyle = ink;
       // the aircraft like on the page: the maker's logo (on a dark card the light copy made for dark backgrounds) in place of its name,
       // then the number and the registration
       const type = f.model || f.aircraft, maker = label === "AIRCRAFT" && type && makerOf(type);
@@ -8183,14 +8308,14 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
       const mark = art && (light ? art.light.naturalWidth && art.light : art.dark);  // original colours on a light card
       if (mark) {
         const mw = mark.naturalWidth || mark.width, mh = mark.naturalHeight || mark.height;
-        const lh = 15 * U, lw = Math.min(64 * U, mw * lh / mh), lhh = mh * lw / mw;
-        ctx.drawImage(mark, cx, notch + 34.5 * U - lhh / 2, lw, lhh);
+        const lh = 17 * U, lw = Math.min(72 * U, mw * lh / mh), lhh = mh * lw / mw;
+        ctx.drawImage(mark, cx, notch + 38 * U - lhh / 2, lw, lhh);
         const tx = cx + lw + 8 * U;
-        ctx.fillText(shortType(type), tx, notch + 40 * U, w - 10 * U - (tx - cx));
+        ctx.fillText(shortType(type), tx, notch + 45 * U, w - 10 * U - (tx - cx));
       } else {
-        ctx.fillText(value || "–", cx, notch + 40 * U, w - 10 * U);
+        ctx.fillText(value || "–", cx, notch + 45 * U, w - 10 * U);
       }
-      if (sub) { ctx.font = sans(500, 12); ctx.fillStyle = muted; ctx.fillText(sub, cx, notch + 57 * U, w - 10 * U); }
+      if (sub) { ctx.font = sans(500, TS.s); ctx.fillStyle = muted; ctx.fillText(sub, cx, notch + 65 * U, w - 10 * U); }
       cx += w;
     }
     ctx.restore();
@@ -8198,7 +8323,7 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
     const next = plan.legs[i + 1], lay = next && layoverMin(leg, next);
     if (lay != null && lay > 0) {
       const jx = x + cw + gap / 2, txt = `${span(lay)} layover · ${AP[next.f.from].city}`;
-      ctx.font = sans(700, 14);
+      ctx.font = sans(700, TS.s);
       const tw = ctx.measureText(txt).width + 24 * U, th = 26 * U, ty = y0 - th / 2 - 4 * U;
       // shown as the join slides through the middle; hidden while it sits cut off at the frame edge
       const edge = Math.min(jx - tw / 2 - P.x, P.x + P.w - (jx + tw / 2));
@@ -8208,7 +8333,56 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
       ctx.globalAlpha = 1;
     }
   });
+  if (narrow) ctx.restore();
   ctx.textAlign = "left";
+}
+// the end: the whole trip on one boarding pass, its figures counting up while the camera pulls back, then held:
+// the distance large (and how many times round the Earth), below the tear-off line flights, countries, time in the
+// air and CO₂, each with a detail line
+function drawTripSummary(ctx, W, L, plan, t, fade, sans) {
+  const U = L.U, K = cardInks(plan), fl = video.flights;
+  const w = L.portrait ? L.panel.cardW : Math.min(W - 2 * L.side, 470 * U), h = 208 * U, notch = 130 * U;
+  const x = (W - w) / 2, y = L.bottom - h + (1 - easeInOut(fade)) * 16 * U;
+  const c = 1 - (1 - smooth(plan.outroStart + 0.2, plan.outroStart + 1.5, t)) ** 3;  // counting up, slowing at the end
+  const km = fl.reduce((a, f) => a + f.km, 0), air = fl.reduce((a, f) => a + (f.min || 0), 0);
+  const co2 = fl.reduce((a, f) => a + (f.co2 || 0), 0), fuel = fl.reduce((a, f) => a + (f.fuel || 0), 0);
+  const codes = [...new Set(fl.flatMap(f => [f.from, f.to]))], countries = new Set(codes.map(a => AP[a].country).filter(Boolean)).size;
+  const airlines = new Set(fl.map(f => f.airline).filter(Boolean)).size;
+  const t0 = flightTimes(fl[0]).dep, t1 = flightTimes(fl[fl.length - 1]).arr, door = t0 != null && t1 != null && fl.length > 1 ? (t1 - t0) / 60e3 : null;
+  ctx.save(); ctx.globalAlpha *= fade; ctx.translate(x, y); ctx.textBaseline = "alphabetic";
+  passPath(ctx, w, h, notch, U);
+  ctx.shadowColor = K.shadow; ctx.shadowBlur = 18 * U; ctx.shadowOffsetY = 4 * U; ctx.fillStyle = K.card; ctx.fill();
+  ctx.shadowColor = "transparent"; ctx.strokeStyle = K.edge; ctx.lineWidth = 1 * U; ctx.stroke();
+  const caps = (txt, x0, y0, align = "left") => {
+    ctx.font = sans(700, TS.s); ctx.fillStyle = K.muted; ctx.textAlign = align;
+    if ("letterSpacing" in ctx) ctx.letterSpacing = `${0.8 * U}px`;
+    ctx.fillText(txt, x0, y0);
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+  };
+  caps("THE WHOLE TRIP", 18 * U, 34 * U);
+  caps(video.kicker.toUpperCase(), w - 18 * U, 34 * U, "right");
+  ctx.textAlign = "left"; ctx.font = sans(800, TS.xl); ctx.fillStyle = K.ink;
+  const big = `${fmt(Math.round(km * c))} km`;
+  ctx.fillText(big, 18 * U, 92 * U);
+  const bw = ctx.measureText(big).width, laps = km / (2 * Math.PI * EARTH_KM);
+  ctx.font = sans(600, TS.m); ctx.fillStyle = K.muted;
+  ctx.fillText(laps >= 0.1 ? `${(laps * c).toFixed(laps >= 10 ? 0 : laps >= 1 ? 1 : 2)}× around the Earth` : `${codes.length} airports`, 18 * U + bw + 14 * U, 92 * U, w - bw - 50 * U);
+  ctx.strokeStyle = K.tear; ctx.lineWidth = 1.5 * U; ctx.setLineDash([6 * U, 6 * U]);
+  ctx.beginPath(); ctx.moveTo(15 * U, notch); ctx.lineTo(w - 15 * U, notch); ctx.stroke(); ctx.setLineDash([]);
+  const n = v => Math.round(v * c);
+  const cols = [["FLIGHTS", `${n(fl.length)}`, airlines > 1 ? `${airlines} airlines` : `${codes.length} airports`],
+                ["COUNTRIES", `${n(countries)}`, `${codes.length} airports`],
+                ["IN THE AIR", air ? span(Math.max(1, n(air))) : "–", door ? `${span(door)} door to door` : ""],
+                ["CO₂", co2 ? `${fmt(n(co2))} kg` : "–", fuel ? `${fmt(n(fuel))} L fuel` : ""]];
+  if (cols[0][2] === cols[1][2]) cols[0][2] = "";
+  const cw = (w - 36 * U) / cols.length;
+  cols.forEach(([label, value, sub], j) => {
+    const cx = 18 * U + j * cw;
+    caps(label, cx, notch + 22 * U);
+    ctx.textAlign = "left"; ctx.font = sans(700, TS.l); ctx.fillStyle = K.ink; ctx.fillText(value, cx, notch + 47 * U, cw - 8 * U);
+    if (sub) { ctx.font = sans(500, TS.s); ctx.fillStyle = K.muted; ctx.fillText(sub, cx, notch + 66 * U, cw - 8 * U); }
+  });
+  ctx.restore(); ctx.textAlign = "left";
 }
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
