@@ -9449,7 +9449,7 @@ document.addEventListener("keydown", e => {
 /* ---------- About ---------- */
 // the message form posts to a form service, which emails the message on without showing the address anywhere.
 // Set CONTACT.url (and CONTACT.key for Web3Forms) to switch it on; until then the form says messages open soon.
-const CONTACT = { url: "", key: "" };  // e.g. { url: "https://api.web3forms.com/submit", key: "<access key>" } or { url: "https://formspree.io/f/<id>" }
+const CONTACT = { url: "https://api.web3forms.com/submit", key: "6d9e0988-0c0a-4a4b-a509-caa712a662ac" };  // e.g. { url: "https://api.web3forms.com/submit", key: "<access key>" } or { url: "https://formspree.io/f/<id>" }
 function renderAbout() {
   const flown = ALL.filter(f => !f.future);
   $("abFlights").textContent = fmt(flown.length);
@@ -9470,8 +9470,12 @@ $("aboutForm").addEventListener("submit", async e => {
   if (email && !$("abEmail").checkValidity()) { status.className = "ab-status err"; status.textContent = "That email doesn't look right (or leave it empty)."; $("abEmail").focus(); return; }
   $("abSend").disabled = true; status.textContent = "Sending…";
   try {
-    const body = { subject: "Boarding Past – a message", message: msg, ...(email ? { email } : {}), ...(CONTACT.key ? { access_key: CONTACT.key } : {}) };
-    const r = await fetch(CONTACT.url, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
+    // sent as an ordinary form (no custom headers), so the browser posts it straight away without a separate check first
+    const body = new FormData();
+    if (CONTACT.key) body.append("access_key", CONTACT.key);
+    body.append("subject", "Boarding Past – a message"); body.append("from_name", "Boarding Past"); body.append("message", msg);
+    if (email) { body.append("email", email); body.append("replyto", email); }
+    const r = await fetch(CONTACT.url, { method: "POST", headers: { Accept: "application/json" }, body });
     if (!r.ok) throw new Error(r.status);
     form.reset(); status.className = "ab-status ok"; status.textContent = "Sent – thank you!";
   } catch (err) {
