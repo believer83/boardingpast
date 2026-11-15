@@ -1058,7 +1058,7 @@ body {
   font: 14px/1.45 "Twemoji Country Flags", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-button, input, select { font: inherit; color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
 /* spacing scale: 4 · 8 · 12 · 16 · 24 · 32 · 48 */
 :root { --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s7: 48px; }
 .wrap { max-width: 1440px; margin: 0 auto; padding: 0 var(--s5) var(--s7); }
@@ -1090,6 +1090,93 @@ header.top.compact .wordmark .tagline { display: none; }
   would hold the fixed bottom tab bar inside it, under the cards and photos that come later in the page */
   header.top { position: static; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; } }
 header.top h1 { font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -0.02em; }
+/* About: the story of the page, a boarding pass with no name on it, the four tabs, and a message form */
+.ab { display: grid; gap: var(--s5); max-width: 1120px; margin: 0 auto; padding: var(--s2) 0 var(--s7); }
+.ab-kicker { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--text-muted); }
+.ab-hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: var(--s7); align-items: center; padding: var(--s5) 0 var(--s4); }
+.ab-title { margin: 0 0 var(--s4); font-size: clamp(34px, 5.2vw, 60px); line-height: 1.04; font-weight: 800; letter-spacing: -.03em; }
+.ab-title span { background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ab-lead { margin: 0; max-width: 46ch; font-size: 18px; line-height: 1.6; color: var(--text-secondary); }
+/* the pass: notched at the tear-off line, a gradient band on top, a barcode stub */
+.ab-pass-wrap { filter: drop-shadow(0 22px 34px var(--glow)); transform: rotate(-2.5deg); transition: transform .4s cubic-bezier(.3,1.3,.4,1); }
+.ab-pass-wrap:hover { transform: rotate(0deg) translateY(-4px); }
+.ab-pass { --stub: 92px; display: grid; grid-template-columns: 1fr var(--stub); background: var(--surface-1); border-radius: 22px;
+  -webkit-mask: radial-gradient(circle at calc(100% - var(--stub)) 0, #0000 13px, #000 13.5px) top / 100% 51% no-repeat,
+                radial-gradient(circle at calc(100% - var(--stub)) 100%, #0000 13px, #000 13.5px) bottom / 100% 51% no-repeat;
+          mask: radial-gradient(circle at calc(100% - var(--stub)) 0, #0000 13px, #000 13.5px) top / 100% 51% no-repeat,
+                radial-gradient(circle at calc(100% - var(--stub)) 100%, #0000 13px, #000 13.5px) bottom / 100% 51% no-repeat; }
+.ab-pass-main { border-right: 2px dashed var(--border); }
+.ab-pass-head { display: flex; justify-content: space-between; padding: 12px 20px; background: var(--grad); color: var(--on-grad);
+  font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.ab-route { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 18px 20px 6px; }
+.ab-route b { display: block; font: 800 40px/1 "Sora", "Twemoji Country Flags", system-ui, sans-serif; letter-spacing: -.02em; }
+.ab-route small { display: block; margin-top: 4px; font-size: 13px; color: var(--text-muted); }
+.ab-route .r { text-align: right; }
+.ab-route svg { width: 26px; height: 26px; justify-self: center; transform: rotate(90deg); fill: var(--accent);
+  background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent) center / 300% 2px no-repeat; overflow: visible; }
+.ab-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 16px; margin: 0; padding: 12px 20px 20px; }
+.ab-fields dt { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.ab-fields dd { margin: 2px 0 0; font-weight: 700; font-size: 16px; }
+.ab-stub { display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; padding: 18px 0; }
+.ab-bars { flex: 1; width: 44px; min-height: 120px; opacity: .8;
+  background: repeating-linear-gradient(0deg, var(--text-primary) 0 2px, transparent 2px 4px, var(--text-primary) 4px 7px, transparent 7px 9px, var(--text-primary) 9px 10px, transparent 10px 13px); }
+.ab-stub-t { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 10.5px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--text-muted); }
+/* the four tabs */
+.ab-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-top: var(--s4); }
+.ab-head h3, .ab-text h3, .ab-msg h3 { margin: 0; font-size: 22px; letter-spacing: -.01em; }
+.ab-head p { margin: 0; color: var(--text-muted); }
+.ab-tour { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s3); }
+.ab-stop { position: relative; display: grid; gap: 6px; align-content: start; padding: 18px 18px 40px; text-align: left; cursor: pointer; color: inherit;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.ab-stop:hover { transform: translateY(-3px); border-color: transparent;
+  background: linear-gradient(var(--raised), var(--raised)) padding-box, var(--grad) border-box; }
+.is-light .ab-stop:hover { background: linear-gradient(var(--surface-1), var(--surface-1)) padding-box, var(--grad) border-box; }
+.ab-stop:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ab-ic { width: 26px; height: 26px; margin-bottom: 4px; fill: none; stroke: var(--accent); stroke-width: 1.7; stroke-linejoin: round; stroke-linecap: round; }
+.ab-ic .fill { fill: var(--accent); stroke: none; }
+.ab-stop b { font: 700 17px "Sora", "Twemoji Country Flags", system-ui, sans-serif; }
+.ab-stop span { font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+.ab-stop i { position: absolute; left: 18px; bottom: 14px; font-style: normal; color: var(--text-muted); transition: transform .18s ease, color .18s ease; }
+.ab-stop:hover i { transform: translateX(4px); color: var(--accent); }
+/* the story and how it's made */
+.ab-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); }
+.ab-text { padding: 24px 26px; }
+.ab-text h3 { margin-bottom: 12px; }
+.ab-text p:not(.ab-kicker) { margin: 0 0 12px; line-height: 1.7; color: var(--text-secondary); max-width: 60ch; }
+.ab-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.ab-list li { display: grid; gap: 2px; padding-left: 18px; position: relative; line-height: 1.5; }
+.ab-list li::before { content: ""; position: absolute; left: 0; top: .5em; width: 8px; height: 8px; border-radius: 50%; background: var(--grad); }
+.ab-list span { color: var(--text-secondary); font-size: 14.5px; }
+/* the message form */
+.ab-msg { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--s5); padding: 26px; }
+.ab-msg-intro p:not(.ab-kicker) { margin: 10px 0 0; line-height: 1.6; color: var(--text-secondary); max-width: 40ch; }
+.ab-msg-form { display: grid; gap: 14px; }
+.ab-field { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.ab-field em { font-style: normal; font-weight: 500; color: var(--text-muted); }
+.ab-field textarea, .ab-field input { width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--text-primary); font-size: 15px; font-weight: 400; resize: vertical; transition: border-color .15s, box-shadow .15s; }
+.ab-field textarea:focus, .ab-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.ab-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.ab-send { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.ab-btn { border: 0; padding: 11px 22px; border-radius: 999px; background: var(--grad); color: var(--on-grad); font-weight: 700; cursor: pointer;
+  box-shadow: 0 6px 18px var(--glow); transition: transform .15s ease, opacity .15s; }
+.ab-btn:hover { transform: translateY(-1px); }
+.ab-btn:disabled { opacity: .5; cursor: default; transform: none; }
+.ab-status { font-size: 14px; color: var(--text-secondary); }
+.ab-status.ok { color: var(--ok, #22c55e); } .ab-status.err { color: #ef4444; }
+@media (max-width: 900px) {
+  .ab-hero, .ab-cols, .ab-msg { grid-template-columns: 1fr; }
+  .ab-hero { gap: var(--s5); padding-top: var(--s3); }
+  .ab-pass-wrap { max-width: 460px; }
+  .ab-tour { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .ab-tour { grid-template-columns: 1fr; }
+  .ab-route b { font-size: 32px; }
+  .ab-pass { --stub: 64px; }
+  .ab-text, .ab-msg { padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .ab-pass-wrap, .ab-stop, .ab-stop i { transition: none; } }
 /* Boarding Past logo (brand kit): "boarding past" in Sora on a boarding pass, the contrail and plane crossing the tear-off line, the tagline underneath */
 .brand { display: inline-flex; margin: -8px 0 -6px; }
 .wordmark { display: block; height: 96px; width: auto; overflow: visible; }
@@ -1169,10 +1256,12 @@ header.top { view-transition-name: masthead; }
   filter: blur(1.5px); border-radius: 4px; animation: sp-trail 1.15s cubic-bezier(.5,0,.3,1) forwards; opacity: .9; }
 .sp-plane { position: absolute; top: 50%; left: 0; width: 64px; height: 64px; margin-top: -32px; fill: var(--logo-plane, #fff);
   filter: drop-shadow(0 0 10px var(--logo-3, #ff2bd6)); animation: sp-plane 1.15s cubic-bezier(.5,0,.3,1) forwards; }
-.sp-word { font-family: "Sora", system-ui, sans-serif; font-weight: 800; font-size: clamp(42px, 9vw, 88px); letter-spacing: -0.02em; text-align: center;
+.sp-word { font-family: "Sora", "Twemoji Country Flags", system-ui, sans-serif; font-weight: 800; font-size: clamp(42px, 9vw, 88px); letter-spacing: -0.02em; text-align: center;
   background: linear-gradient(90deg in oklch, var(--logo-1, #00e5ff), var(--logo-2, #7c4dff), var(--logo-3, #ff2bd6)); -webkit-background-clip: text; background-clip: text;
-  color: transparent; opacity: 0; transform: translateY(14px); animation: sp-word .6s .75s ease forwards; position: relative; top: -64px; }
-.sp-word small { display: block; font-size: 13px; font-weight: 300; letter-spacing: .5em; color: var(--text-muted); -webkit-text-fill-color: var(--text-muted); margin-top: 6px; }
+  color: transparent; opacity: 0; transform: translateY(14px); animation: sp-word .6s .75s ease forwards;
+  position: absolute; left: 0; right: 0; bottom: calc(50% + 22px); line-height: 1.05; }  /* like the logo: the name above the contrail, the tagline below it */
+.sp-word small { position: absolute; left: 0; right: 0; top: calc(100% + 46px); font-size: 13px; font-weight: 300; letter-spacing: .5em; padding-left: .5em;
+  color: var(--text-muted); -webkit-text-fill-color: var(--text-muted); }
 @keyframes sp-trail { to { transform: scaleX(1); opacity: .35; } }
 @keyframes sp-plane { from { transform: translateX(-80px); } to { transform: translateX(calc(100vw + 20px)); } }
 @keyframes sp-word { to { opacity: 1; transform: none; } }
@@ -1233,7 +1322,6 @@ header.top { view-transition-name: masthead; }
 .play-sm.flight .ic svg { width: 10px; height: 10px; }
 .play-sm.big .ic svg { width: 18px; height: 18px; margin-left: 2px; }
 .upc-lay .ic { color: var(--series-1); }
-.upc-warn { display: inline-flex; align-items: center; gap: 4px; }
 .tr-caret .ic { transition: transform .2s ease; }
 .tr-caret.open .ic { transform: rotate(90deg); }
 .empty.all-good { display: flex; gap: 8px; align-items: center; color: #16a34a; font-weight: 600; }
@@ -1305,10 +1393,12 @@ header.top { view-transition-name: masthead; }
 .style-panel select { max-width: 100%; min-width: 0; box-sizing: border-box; }
 .style-panel .row { min-width: 0; }
 .fc-day { font-size: 0.75em; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
-.delay { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
-.delay.ok { background: #dcfce7; color: #166534; } .delay.late { background: #fef3c7; color: #92400e; }
-.delay.bad { background: #fee2e2; color: #991b1b; }
-.real-stamp { color: var(--series-1); font-weight: 600; white-space: nowrap; }
+/* early / late: small and quiet like the "planned" tag, a thin outline in its colour */
+.delay { --dc: #22c55e; font-size: 10.5px; font-weight: 500; padding: 0 6px; border-radius: 10px; white-space: nowrap; line-height: 1.5;
+  border: 1px solid color-mix(in srgb, var(--dc) 45%, transparent); color: color-mix(in oklab, var(--dc) 55%, var(--text-secondary)); }
+.delay.late { --dc: #f59e0b; } .delay.bad { --dc: #ef4444; }
+.fc-punct { margin-top: 4px; }
+.real-stamp { white-space: nowrap; }  /* actual times look like the others: the icon says which moment it is */
 
 /* Map */
 .card {
@@ -1458,7 +1548,7 @@ table.flights tbody tr.sel { background: var(--wash); box-shadow: inset 3px 0 0 
   #passport:not(.pp-open) .passport { grid-column: 1; grid-row: 1; pointer-events: none; border-radius: 10px; }
   #passport:not(.pp-open) .pp-actions { display: none; }
   #passport:not(.pp-open) .pp-peek { display: grid; gap: 4px; grid-column: 2; grid-row: 1; }
-  .pp-peek b { font-family: "Sora", system-ui, sans-serif; font-size: 16px; }
+  .pp-peek b { font-family: "Sora", "Twemoji Country Flags", system-ui, sans-serif; font-size: 16px; }
   .pp-peek span { color: var(--text-secondary); font-size: 13px; }
   .pp-peek small { margin-top: 6px; width: fit-content; padding: 4px 12px; border-radius: 999px; background: var(--grad); color: var(--on-grad); font-weight: 600; font-size: 12px; box-shadow: 0 4px 14px var(--glow); }
   #passport.pp-open { position: fixed; inset: 0; z-index: 5000; display: block; overflow-y: auto; overscroll-behavior: contain;
@@ -1583,7 +1673,7 @@ table.flights tbody tr.sel { background: var(--wash); box-shadow: inset 3px 0 0 
 .lay-map { min-width: 0; }
 .lay-map.wide { grid-column: 1 / -1; }
 .lay-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.lay-head b { font-family: "Sora", system-ui, sans-serif; font-size: 16px; }
+.lay-head b { font-family: "Sora", "Twemoji Country Flags", system-ui, sans-serif; font-size: 16px; }
 .lay-head span { color: var(--text-muted); font-size: 12px; }
 .lay-map .seatmap svg { margin-top: 4px; }
 .colchart { position: relative; height: 200px; margin: 8px 0 22px 36px; }
@@ -1782,7 +1872,7 @@ table.flights tbody tr.sel { background: var(--wash); box-shadow: inset 3px 0 0 
 .tr-head:hover { background: var(--wash); }
 .tr-caret { color: var(--text-muted); width: 14px; font-size: 16px; }
 .trip-row.open .tr-head { border-bottom: 1px solid var(--grid); }
-.tr-body { display: grid; grid-template-columns: minmax(0, 760px) minmax(0, 1fr); gap: 20px; align-items: start; padding: 0 20px 20px; margin-top: 16px; }
+.tr-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; padding: 0 20px 20px; margin-top: 16px; }
 .tr-side { position: sticky; top: calc(var(--header-h, 0px) + var(--controls-h, 0px) + 12px); display: grid; gap: 10px; }
 .tr-map { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; overflow: hidden; cursor: pointer;
   border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
@@ -1866,23 +1956,33 @@ table.flights tr.tr-row:hover { background: none; }
 .fc-head img.logo { flex: 0 1 auto; min-width: 0; }
 @media (max-width: 440px) { .fc-head { gap: 6px; } .fc-head img.logo { width: 76px; } .fc-head .tag { display: none; } }  /* planned cards are dashed */
 .fc-head img.logo { height: 32px; width: 100px; object-fit: contain; object-position: left center; }
-.fc-route { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr); align-items: start; gap: 8px; padding: 10px 16px 14px; }
+.fc-route { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(56px, 0.8fr) minmax(0, 1.25fr); align-items: start; gap: 8px; padding: 10px 16px 14px; }
 .fc-end.right { text-align: right; }
 .fc-code { font-size: 26px; font-weight: 800; letter-spacing: 0.01em; line-height: 1.05; }
-.fc-ap { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-top: 2px; overflow-wrap: anywhere; }
+.fc-ap { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-top: 2px; overflow-wrap: anywhere; }
 .fc-country { font-size: 11px; color: var(--text-muted); overflow-wrap: anywhere; }
-.fc-time { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.fc-time { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 3px; white-space: nowrap; }
+.fc-end.right .fc-time { justify-content: flex-end; }
+.fc-time .t-pair + .t-pair { margin-top: 0; }
+.fc-time .fc-day { margin-left: -4px; }
+.fcard { container-type: inline-size; }
+@container (max-width: 430px) {
+  .fc-route { grid-template-columns: minmax(0, 1.5fr) minmax(48px, 0.6fr) minmax(0, 1.5fr); gap: 4px; }
+  .fc-time { font-size: 12px; gap: 5px; } .fc-time .t-ic svg { width: 1.15em; height: 1.15em; }
+  .fc-dur, .fc-km { font-size: 11px; }
+}
 /* gate departure / take-off / landing / gate arrival times, each with its icon */
 .t-pair { display: flex; align-items: center; gap: 4px; white-space: nowrap; line-height: 1.35; }
 .right .t-pair, td.num .t-pair { justify-content: flex-end; }
 .t-pair + .t-pair { margin-top: 1px; }
+.t-stack { display: inline-flex; flex-direction: column; }  /* gate and runway times, one above the other */
 .t-ic { display: inline-flex; color: var(--text-muted); }
-.real-stamp .t-ic { color: inherit; }
 .t-ic svg { width: 1.3em; height: 1.3em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .t-ic svg .solid { fill: currentColor; stroke: none; }
 .t-ic svg .dash { stroke: var(--surface-1); stroke-width: 1.1; stroke-linecap: butt; }
 .fc-mid { text-align: center; align-self: center; }
-.fc-dur { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; white-space: nowrap; }
+.fc-dur, .fc-km { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.fc-dur { margin-bottom: 7px; } .fc-km { margin-top: 7px; }  /* time in the air above the line, distance below */
 .fc-line { position: relative; height: 2px; background-image: linear-gradient(90deg in oklch, var(--grid) 50%, transparent 50%); background-size: 8px 2px; }
 .fc-line svg { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; transform: translate(-50%, -50%); fill: var(--series-1);
   background: var(--surface-1); border-radius: 50%; padding: 2px; }
@@ -1961,16 +2061,6 @@ img.logo { height: 22px; width: 56px; object-fit: contain; flex: none; }
 .cell2.flight .fno { display: inline-flex; align-items: center; gap: 8px; }
 .cell2.flight .c-sub:empty { display: none; }  /* the symbol replaced the wordmark line: the number centred in its row */
 .lay-next .al-sym { margin-right: 4px; }
-/* dark pages: airline logos on a small light chip, as airline apps show them, so dark and thin logos stay readable */
-/* the chip fits the logo: the width follows the (trimmed) logo, up to the room each place has */
-html:not(.is-light) img.logo { box-sizing: border-box; background: #f7f7fb; border-radius: 6px; padding: 3px 6px; box-shadow: 0 1px 2px rgba(0,0,0,.3);
-  width: auto; max-width: 64px; object-position: center; }
-html:not(.is-light) .fc-head img.logo { max-width: 110px; padding: 5px 8px; }
-html:not(.is-light) .cell2.flight img.logo { max-width: 78px; }
-html:not(.is-light) .rec-meta img.logo { height: 22px; max-width: 70px; }
-html:not(.is-light) .hg-logos img.logo { height: 22px; max-width: 64px; }
-html:not(.is-light) .fleet-item img.logo { height: 18px; max-width: 52px; padding: 2px 4px; }
-html:not(.is-light) .postcard .fc-head img.logo { max-width: 92px; }
 /* manufacturer logo next to an aircraft type; dark mode swaps in the lifted copy */
 .maker { display: inline-flex; flex: none; vertical-align: middle; }
 .maker img { display: block; height: 14px; width: auto; max-width: 60px; object-fit: contain; object-position: left center; }
@@ -2058,7 +2148,7 @@ html:not(.is-light) .hg-art.window .pane.drawn { background: radial-gradient(120
 .hg-body { padding: 12px 14px 14px; }
 .hg-body h3 { margin: 0; font-size: 16px; }
 .hg-stats { display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 8px; margin-top: 10px; }
-.hg-stats b { display: block; font: 800 15px/1.2 "Sora", system-ui, sans-serif; white-space: nowrap; background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hg-stats b { display: block; font: 800 15px/1.2 "Sora", "Twemoji Country Flags", system-ui, sans-serif; white-space: nowrap; background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hg-stats small { display: block; font-size: 11px; color: var(--text-muted); }
 .hg-when { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 6px; }
 .hg-when span:first-child { color: var(--text-muted); }
@@ -2098,7 +2188,7 @@ html:not(.is-light) .hg-art.window .pane.drawn { background: radial-gradient(120
 .coll-maker.none { opacity: .7; }
 .coll-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 14px; }
 .coll-n { font-size: 12px; color: var(--text-muted); }
-.coll-n b { font: 800 20px/1 "Sora", system-ui, sans-serif; background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.coll-n b { font: 800 20px/1 "Sora", "Twemoji Country Flags", system-ui, sans-serif; background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .coll-bar { height: 5px; border-radius: 3px; background: var(--wash); margin: 8px 0 12px; overflow: hidden; }
 .coll-bar span { display: block; height: 100%; background: var(--grad); border-radius: 3px; }
 .coll-fams { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 6px; }
@@ -2118,7 +2208,7 @@ html:not(.is-light) .hg-art.window .pane.drawn { background: radial-gradient(120
 .fleet-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 12px 0 14px; }
 .fleet-stat { --fc: var(--f, var(--series-1)); text-align: left; padding: 12px 14px; cursor: pointer; color: var(--text-secondary); min-width: 0;
   background: radial-gradient(180px 90px at 0 0, color-mix(in srgb, var(--fc) 13%, transparent), transparent 72%), var(--surface-1); }
-.fleet-stat b { display: block; font: 800 24px/1.15 "Sora", system-ui, sans-serif; color: color-mix(in oklab, var(--fc) 62%, var(--text-primary)); }
+.fleet-stat b { display: block; font: 800 24px/1.15 "Sora", "Twemoji Country Flags", system-ui, sans-serif; color: color-mix(in oklab, var(--fc) 62%, var(--text-primary)); }
 .fleet-stat small { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 2px; }
 .fleet-stat small i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--fc); }
 .fleet-stat:hover { border-color: color-mix(in srgb, var(--fc) 45%, var(--border)); }
@@ -2127,14 +2217,14 @@ html:not(.is-light) .hg-art.window .pane.drawn { background: radial-gradient(120
 .fleet-item { display: flex; gap: 12px; align-items: center; padding: 10px; cursor: pointer; min-width: 0; }
 .fleet-item:hover { border-color: var(--series-1); }
 .fleet-item > div:last-child { min-width: 0; }
-.fleet-item b { display: flex; align-items: center; gap: 8px; font: 700 15px/1.3 "Sora", system-ui, sans-serif; }
+.fleet-item b { display: flex; align-items: center; gap: 8px; font: 700 15px/1.3 "Sora", "Twemoji Country Flags", system-ui, sans-serif; }
 .fleet-item small { display: block; font-size: 11px; color: var(--text-muted); }
 .fleet-item img.logo { height: 14px; width: 40px; object-fit: contain; }
 .fleet-tag { display: inline-flex; align-items: baseline; gap: 5px; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 .fleet-tag i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--f); align-self: center; }
 .hg-reg .fleet-tag { grid-column: 2; }
 .seat-facts { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 12px 0 14px; }
-.seat-facts b { display: block; font: 700 24px/1.1 "Sora", system-ui, sans-serif; }
+.seat-facts b { display: block; font: 700 24px/1.1 "Sora", "Twemoji Country Flags", system-ui, sans-serif; }
 .seat-facts small { font-size: 11px; color: var(--text-muted); }
 .splits { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px 22px; }
 .split { grid-column: span 2; min-width: 0; } .split.half { grid-column: span 3; }
@@ -2198,7 +2288,7 @@ html:not(.is-light) .hg-art.window .pane.drawn { background: radial-gradient(120
 .pc-map > img { display: block; width: 100%; object-fit: cover; }
 .pc-hud { position: absolute; left: 0; right: 0; top: 0; padding: 22px 26px 30px; --text-primary: #fff; --text-secondary: rgba(255,255,255,.86); --text-muted: rgba(255,255,255,.62); --surface-1: #0b0a20; }
 .pc-hud h2 { margin: 0; font: 800 28px/1.2 "Sora", "Twemoji Country Flags", system-ui, sans-serif; color: #fff; overflow-wrap: anywhere; }
-.pc-kick { margin-bottom: 4px; font: 700 11px/1.2 "Sora", system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--text-secondary); }
+.pc-kick { margin-bottom: 4px; font: 700 11px/1.2 "Sora", "Twemoji Country Flags", system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--text-secondary); }
 .pc-hud .facts { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
 .pc-hud .fact { padding: 2px 9px 2px 6px; gap: 5px; line-height: 1.35; }
 .pc-hud .trip-line { max-width: none; margin-top: 10px; padding-bottom: 14px; }
@@ -2215,7 +2305,7 @@ html:not(.is-light) .hg-art.window .pane.drawn { background: radial-gradient(120
 .postcard .fc-code { font-size: 22px; }
 .postcard .fc-country { display: none; }
 .fc-ap .fc-flag { display: none; } .postcard .fc-ap .fc-flag { display: inline; }
-.postcard .fc-dur { margin-bottom: 4px; }
+.postcard .fc-dur { margin-bottom: 6px; } .postcard .fc-km { margin-top: 6px; }
 .postcard .fc-foot { padding: 7px 14px; }
 .postcard .fc-foot span.sub { font-size: 11px; }
 .postcard .upc-lay { margin-top: 5px; padding: 4px 12px; font-size: 12px; }
@@ -2242,6 +2332,39 @@ html:not(.is-light) .hg-art.window .pane.drawn { background: radial-gradient(120
 .pop-actions { display: flex; gap: 6px; }
 .fc-head .img-btn { margin-left: -4px; }
 .row-actions { display: inline-flex; gap: 5px; vertical-align: middle; }
+/* Share: what was made (image or video), the phone's share list, the networks, and a plain download */
+.share-modal { position: fixed; inset: 0; z-index: 4300; display: grid; place-items: center; padding: 16px; background: rgba(5, 4, 20, .62);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.share-modal[hidden] { display: none; }
+.share-box { position: relative; display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 340px); gap: 22px; align-items: center;
+  max-height: calc(100dvh - 32px); overflow: auto; padding: 22px; border-radius: 22px; background: var(--raised); animation: share-in .28s cubic-bezier(.3,1.3,.4,1); }
+@keyframes share-in { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+.share-x { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; }
+.share-prev { display: grid; place-items: center; border-radius: 14px; overflow: hidden; background: var(--surface-2); max-height: 380px; }
+.share-prev img, .share-prev video { display: block; max-width: 100%; max-height: 380px; object-fit: contain; }
+.share-body { display: grid; gap: 12px; }
+.share-body h3 { margin: 0; padding-right: 36px; font-size: 22px; }
+.share-sub { margin: -6px 0 2px; font-size: 13px; color: var(--text-muted); overflow-wrap: anywhere; }
+.share-main, .share-dl { display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 999px; padding: 11px 18px; font-weight: 700; cursor: pointer; }
+.share-main { border: 0; background: var(--grad); color: var(--on-grad); box-shadow: 0 6px 18px var(--glow); }
+.share-main[hidden] { display: none; }
+.share-dl { border: 1px solid var(--border); background: transparent; color: var(--text-primary); }
+.share-main .ic svg, .share-dl .ic svg { width: 18px; height: 18px; }
+.share-nets { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.share-net { display: grid; justify-items: center; gap: 6px; padding: 10px 2px 8px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2);
+  color: var(--text-secondary); font-size: 11.5px; font-weight: 600; cursor: pointer; transition: transform .15s ease, border-color .15s ease, color .15s ease; }
+.share-net svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.share-net svg .solid { fill: currentColor; stroke: none; }
+.share-net:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--text-primary); }
+.share-net:focus-visible, .share-main:focus-visible, .share-dl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.share-how { margin: -2px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--text-muted); }
+.share-note { margin: 0; min-height: 1.2em; font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
+.share-note:empty { display: none; }
+@media (max-width: 620px) {
+  .share-box { grid-template-columns: 1fr; gap: 14px; padding: 18px; width: 100%; }
+  .share-prev, .share-prev img, .share-prev video { max-height: 34dvh; }
+}
+@media (prefers-reduced-motion: reduce) { .share-box { animation: none; } .share-net { transition: none; } }
 .img-menu { position: fixed; z-index: 2100; display: grid; min-width: 230px; padding: 6px; background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
 .img-menu[hidden] { display: none; }
 .img-menu small { padding: 4px 9px; font-size: 11px; color: var(--text-muted); }
@@ -2285,8 +2408,6 @@ html:not(.is-light) .hg-art.window .pane.drawn { background: radial-gradient(120
 .upc-flights { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin-top: 18px; max-width: 760px; }
 .upc-leg { min-width: 0; }
 .upc-lay { display: flex; gap: 4px 10px; align-items: center; flex-wrap: wrap; margin-top: 6px; padding: 4px 12px; background: var(--wash); border-radius: 10px; font-size: 12.5px; line-height: 1.4; }
-.upc-warn { font-size: 11px; font-weight: 600; padding: 0 7px; border-radius: 999px; background: #fef3c7; color: #92400e; }
-.upc-warn.bad { background: #fee2e2; color: #991b1b; }
 .empty-state { grid-column: 1 / -1; display: grid; justify-items: center; gap: 6px; padding: 36px 16px; text-align: center; color: var(--text-secondary); }
 .es-art { color: var(--series-1); opacity: .8; width: 140px; }
 .es-art svg { display: block; width: 100%; height: auto; }
@@ -2302,7 +2423,7 @@ td.empty-cell { cursor: default; }
 @media (max-width: 1000px) { .rl-wrap { grid-template-columns: minmax(0, 1fr); } }
 .rl-preview { position: sticky; top: calc(var(--header-h, 0px) + var(--controls-h, 0px) + 12px); padding: 16px; display: grid; gap: 12px; }
 .rl-prev-head { display: grid; gap: 2px; }
-.rl-prev-head b { font-family: "Sora", system-ui, sans-serif; font-size: 16px; overflow-wrap: anywhere; }
+.rl-prev-head b { font-family: "Sora", "Twemoji Country Flags", system-ui, sans-serif; font-size: 16px; overflow-wrap: anywhere; }
 .rl-prev-head .muted { font-size: 12.5px; }
 .rl-pic { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius); overflow: hidden; background: var(--surface-2); border: 1px solid var(--border); }
 .rl-pic-empty { position: absolute; inset: 0; display: grid; place-items: center; padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px;
@@ -2474,10 +2595,11 @@ td.empty-cell { cursor: default; }
       <text class="tagline" x="95" y="346" textLength="700" lengthAdjust="spacing" font-family="Sora, system-ui, sans-serif" font-weight="300" font-size="33" style="fill:var(--text-muted)">BEEN THERE, FLOWN THAT</text>
       </svg></h1>
     <div class="tabs" role="tablist">
-      <button role="tab" aria-selected="true" data-tab="stats" title="Your flight passport, key figures, records and charts"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-6M21 20H3"/></svg><span class="tab-l">Statistics</span><span class="tab-s" aria-hidden="true">Stats</span></button>
-      <button role="tab" aria-selected="false" data-tab="map" title="Every flight and visited city on a map or globe, and the list of flights or trips"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span class="tab-l">Travel log</span><span class="tab-s" aria-hidden="true">Travel log</span></button>
-      <button role="tab" aria-selected="false" data-tab="hangar" title="The aircraft you flew: types, registrations, photos"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg><span class="tab-l">Hangar</span><span class="tab-s" aria-hidden="true">Hangar</span></button>
-      <button role="tab" aria-selected="false" data-tab="reel" title="Make a video of any trip, flown or dreamed"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg><span class="tab-l">Your reel</span><span class="tab-s" aria-hidden="true">Reel</span></button>
+      <button role="tab" aria-selected="true" data-tab="stats"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-6M21 20H3"/></svg><span class="tab-l">Statistics</span><span class="tab-s" aria-hidden="true">Stats</span></button>
+      <button role="tab" aria-selected="false" data-tab="map"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span class="tab-l">Travel log</span><span class="tab-s" aria-hidden="true">Travel log</span></button>
+      <button role="tab" aria-selected="false" data-tab="hangar"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg><span class="tab-l">Hangar</span><span class="tab-s" aria-hidden="true">Hangar</span></button>
+      <button role="tab" aria-selected="false" data-tab="reel"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg><span class="tab-l">Your reel</span><span class="tab-s" aria-hidden="true">Reel</span></button>
+      <button role="tab" aria-selected="false" data-tab="about"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.6v.2"/></svg><span class="tab-l">About</span><span class="tab-s" aria-hidden="true">About</span></button>
     </div>
     <div class="count" id="count"></div>
     <div class="theme-pick">
@@ -2577,6 +2699,83 @@ td.empty-cell { cursor: default; }
     <div id="reel"></div>
   </section>
 
+  <!-- About: why the page exists, what it is, how it's made, and a message form. No name, no photo, no home airport:
+       the page stays anonymous. The texts marked "draft" are placeholders to be rewritten. -->
+  <section id="tab-about" hidden>
+    <div class="ab">
+      <div class="ab-hero">
+        <div class="ab-intro">
+          <p class="ab-kicker">About this page</p>
+          <h2 class="ab-title">Every flight,<br><span>one boarding past.</span></h2>
+          <p class="ab-lead"><!-- draft -->A personal logbook of the flights I've taken: where they went, what flew them, and the stories in between. Kept for the love of flying, shared without a name.</p>
+        </div>
+        <div class="ab-pass-wrap" aria-hidden="true">
+          <div class="ab-pass">
+            <div class="ab-pass-main">
+              <div class="ab-pass-head"><span>Boarding pass</span><span>BP 001</span></div>
+              <div class="ab-route"><div><b>PST</b><small>The past</small></div><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg><div class="r"><b>NXT</b><small>The next trip</small></div></div>
+              <dl class="ab-fields">
+                <div><dt>Passenger</dt><dd>Anonymous</dd></div>
+                <div><dt>Flights</dt><dd id="abFlights">–</dd></div>
+                <div><dt>Since</dt><dd id="abSince">–</dd></div>
+                <div><dt>Seat</dt><dd>1A Window</dd></div>
+                <div><dt>Class</dt><dd>Avgeek</dd></div>
+                <div><dt>Gate</dt><dd>Always open</dd></div>
+              </dl>
+            </div>
+            <div class="ab-stub"><span class="ab-bars"></span><span class="ab-stub-t">Been there · flown that</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ab-head"><h3>What it is</h3><p>Four ways into the same logbook.</p></div>
+      <div class="ab-tour">
+        <button class="ab-stop card" type="button" data-goto="stats"><svg class="ab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-6M21 20H3"/></svg><b>Statistics</b><span>A flight passport, the key figures, records and charts of every flight.</span><i aria-hidden="true">→</i></button>
+        <button class="ab-stop card" type="button" data-goto="map"><svg class="ab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><b>Travel log</b><span>Every route on a map or a globe, and each trip told flight by flight.</span><i aria-hidden="true">→</i></button>
+        <button class="ab-stop card" type="button" data-goto="hangar"><svg class="ab-ic" viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg><b>Hangar</b><span>The aircraft behind the flights: types, registrations and photos.</span><i aria-hidden="true">→</i></button>
+        <button class="ab-stop card" type="button" data-goto="reel"><svg class="ab-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg><b>Your reel</b><span>A short video of any trip, ready for Instagram, flown or dreamed.</span><i aria-hidden="true">→</i></button>
+      </div>
+
+      <div class="ab-cols">
+        <article class="card ab-text">
+          <p class="ab-kicker">Why I made it</p>
+          <h3>One place for every flight and every trip</h3>
+          <p>A fan of airlines for as long as I can remember, I've logged my flights on FlightMemory for more than 20 years. It still holds my history, but it has become an outdated tool, and the few others out there – OpenFlights, Flightdiary, myFlightradar24 – mostly add complexity: unreliable imports, dull interfaces, and something new to work around at every update.</p>
+          <p>Then there's the travel bug. Google Maps, TripAdvisor's visited cities, an app for visited countries… every trip became a challenge to update them all.</p>
+          <p>And sharing a trip on Instagram? Apps like TravelBoast or mult.dev look childish, make you sit through ads, and charge a small fortune for a 20-second story that disappears after 24 hours.</p>
+          <p>As an IT professional, I ended up starting my own coding project to automate all of it, and to build a single platform that handles everything my way: my own ideas, my own data, my own design. Boarding Past is the result.</p>
+        </article>
+        <article class="card ab-text">
+          <p class="ab-kicker">How it's made</p>
+          <h3>Logged by hand, checked against the sky</h3>
+          <ul class="ab-list">
+            <li><b>Logged once, on FlightMemory</b><span>every flight entered in one place, the logbook kept for over 20 years.</span></li>
+            <li><b>Synced everywhere else</b><span>the same flights sent on to OpenFlights and myFlightradar24 automatically – no more typing each one three times.</span></li>
+            <li><b>Enriched with real data</b><span>actual departure and landing times, and the path each flight really flew, from public flight-tracking data.</span></li>
+            <li><b>The aircraft themselves</b><span>registrations, types and ages, with photos of the very aircraft from Planespotters.net.</span></li>
+            <li><b>Ready to share</b><span>reels, stories and images of any flight or trip for Instagram, TikTok and Facebook, with every detail: route, airline, aircraft, seat, times and distance.</span></li>
+            <li><b>Open maps</b><span>OpenStreetMap data and open map styles, drawn in the theme's colours.</span></li>
+            <li><b>Nothing about you</b><span>no ads, no analytics, no cookies. Your theme and settings stay on your device.</span></li>
+          </ul>
+        </article>
+      </div>
+
+      <form class="card ab-msg" id="aboutForm" novalidate>
+        <div class="ab-msg-intro">
+          <p class="ab-kicker">Send a message</p>
+          <h3>Say hello, share a trip, spot a mistake</h3>
+          <p>No name needed. Leave an email only if you'd like a reply; it's never shown on the page.</p>
+        </div>
+        <div class="ab-msg-form">
+          <label class="ab-field"><span>Message</span><textarea id="abMessage" name="message" rows="5" maxlength="3000" required placeholder="Your message…"></textarea></label>
+          <label class="ab-field"><span>Email <em>(optional, for a reply)</em></span><input id="abEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com"></label>
+          <input class="ab-hp" name="botcheck" type="checkbox" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="ab-send"><button class="ab-btn" id="abSend" type="submit">Send message</button><span class="ab-status" id="abStatus" role="status"></span></div>
+        </div>
+      </form>
+    </div>
+  </section>
+
   <section id="tab-stats">
     <div class="stats-top">
       <div class="stats-left"><div id="passport"></div></div>
@@ -2590,6 +2789,21 @@ td.empty-cell { cursor: default; }
 </div>
 <button class="back-list" id="backToList" type="button" hidden>↓ Back to list</button>
 <div class="img-menu" id="imgMenu" role="menu" hidden></div>
+<div class="share-modal" id="shareModal" hidden role="dialog" aria-modal="true" aria-labelledby="shTitle">
+  <div class="share-box card">
+    <button class="icon-btn round-btn share-x" id="shClose" type="button" aria-label="Close"></button>
+    <div class="share-prev" id="shPrev"></div>
+    <div class="share-body">
+      <h3 id="shTitle">Ready to share</h3>
+      <p class="share-sub" id="shSub"></p>
+      <button class="share-main" id="shNative" type="button"></button>
+      <div class="share-nets" id="shNets"></div>
+      <p class="share-how" id="shHow"></p>
+      <button class="share-dl" id="shSave" type="button"></button>
+      <p class="share-note" id="shNote" role="status"></p>
+    </div>
+  </div>
+</div>
 <div class="tip" id="tip"></div>
 <div class="video-modal" id="videoModal" hidden role="dialog" aria-label="Flight video">
   <div class="video-box">
@@ -2601,9 +2815,9 @@ td.empty-cell { cursor: default; }
       <label>Cards <select id="videoCardTheme"><option value="dark">Dark</option><option value="light">Light</option><option value="off">Off</option></select></label>
       <label class="video-opt" id="videoNamesOpt"><input type="checkbox" id="videoNames"> Country names</label>
       <label>Length <input type="range" id="videoLength" min="10" max="60" step="1" value="12"> <span id="videoLengthVal">12 s</span></label>
-      <label>Format <select id="videoFormat"><option value="story" selected>9:16 Reel / Story</option><option value="landscape">16:9</option><option value="square">Square</option></select></label>
+      <label>Format <select id="videoFormat"><option value="story" selected>Instagram story / Reel</option><option value="iphone">iPhone</option><option value="horizontal">Postcard, horizontal</option><option value="vertical">Postcard, vertical</option><option value="landscape">16:9</option><option value="square">Square</option></select></label>
       <button class="icon-btn" id="videoReplay" type="button"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4v4.5H9"/></svg></span>Replay</button>
-      <button class="icon-btn primary" id="videoRecord" type="button"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></svg></span>Download video</button>
+      <button class="icon-btn primary" id="videoRecord" type="button"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14.5V3.8M7.8 8 12 3.8 16.2 8"/><path d="M5.5 11.5v7a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5v-7"/></svg></span>Share video</button>
       <span class="muted" id="videoStatus"></span>
       <button class="icon-btn round-btn" id="videoClose" type="button" aria-label="Close" title="Close"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></span></button>
     </div>
@@ -2647,6 +2861,8 @@ function withRealTimes(f) {  // gate times only: a take-off time in place of the
            min: arr ? Math.round((arr - dep) / 60e3) : f.min, sched: { time: f.time, arr_time: f.arr_time, min: f.min } };
 }
 const flightList = () => state.real.times ? (ALL_REAL || (ALL_REAL = ALL.map(withRealTimes))) : ALL;
+// a trip's flights as the list shows them (TRIPS holds the flights as logged)
+const asShown = fl => { const byId = new Map(flightList().map(f => [f.id, f])); return fl.map(f => byId.get(f.id) || f); };
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
@@ -2815,12 +3031,12 @@ const PALETTES = {
 const PALETTE_NAMES = { aurora: "Aurora", mint: "Mint", neon: "Neon", blueprint: "Blueprint", sunset: "Sunset",
                         citrus: "Citrus", synthwave: "Synthwave", glitch: "Glitch", flamingo: "Flamingo", lava: "Lava",
                         spectrum: "Spectrum", highlighter: "Highlighter" };
-const DEFAULT_PALETTE = "aurora";  // the brand palette; the page opens on it, in dark mode, until another theme or Light is picked
+const DEFAULT_PALETTE = "aurora";  // the brand palette; the page opens on it, in dark mode (whatever the device's setting), until another theme or Light is picked
 const pal = () => PALETTES[document.documentElement.dataset.palette] || PALETTES[DEFAULT_PALETTE];
 try {  // before the first render, so the page doesn't flash the other palette or mode
   const saved = localStorage.getItem("flightmap.palette"), mode = localStorage.getItem("flightmap.mode");
   document.documentElement.dataset.palette = PALETTES[saved] ? saved : DEFAULT_PALETTE;  // a saved "classic" (removed) falls back too
-  if (mode === "light" || mode === "dark") document.documentElement.dataset.theme = mode;
+  document.documentElement.dataset.theme = mode === "light" ? "light" : "dark";  // dark until Light is picked
 } catch (e) { /* storage unavailable */ }
 const cityOf = c => AP[c] ? AP[c].city : c;
 // Flag emoji from a 2-letter country code (regional indicator symbols)
@@ -2834,6 +3050,10 @@ const FLAG_URL = "https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.8
 const FLAG_FACE = src => `@font-face { font-family: "Twemoji Country Flags"; unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E007F; src: url(${src}) format("woff2"); font-display: swap; }`;
 let flagFontData = "";  // the font as a data: URL, for SVG images (which can't reach the page's fonts)
 const needFlagFont = (() => {
+  // Windows never draws flag emoji (on some setups the letters even come out in colour, which the test below would take
+  // for a flag), so there it is always loaded; elsewhere only when a flag comes out as grey letters
+  const ua = navigator.userAgentData && navigator.userAgentData.platform || navigator.platform || navigator.userAgent || "";
+  if (/win/i.test(ua) && !/darwin/i.test(ua)) return true;
   try {
     const c = el("canvas", { width: 40, height: 24 }), g = c.getContext("2d", { willReadFrequently: true });
     g.font = "20px sans-serif"; g.textBaseline = "top"; g.fillStyle = "#000"; g.fillText(flag("FR"), 0, 0);
@@ -3071,15 +3291,14 @@ async function downloadPassport(btn) {
     await loadScript(CDN.htmlToImage);
     const node = $("passport").firstElementChild;
     const blob = await htmlToImage.toBlob(node, { pixelRatio: 3, cacheBust: true });
-    downloadBlob(blob, `boarding-past-passport-${localIso(new Date())}.png`);
+    openShare(blob, `boarding-past-passport-${localIso(new Date())}.png`, { what: "Flight passport" });
   } catch (e) {
     alert("Couldn't make the image: " + (e.message || e));
   } finally {
     btn.disabled = false; btn.replaceChildren(...label);
   }
 }
-// "My travels": a 1080 × 1080 card with the headline figures in the theme's colours; the share sheet where files can be
-// shared (phones), otherwise a download
+// "My travels": a 1080 × 1080 card with the headline figures in the theme's colours, in the Share panel
 function shareStatsCard(vis, { km, min, apCodes }) {
   const S = 1080, c = el("canvas", { width: S, height: S }), g = c.getContext("2d"), P = pal(), [c0, c1, c2] = P.holo;
   g.fillStyle = "#0b0a1f"; g.fillRect(0, 0, S, S);
@@ -3089,7 +3308,7 @@ function shareStatsCard(vis, { km, min, apCodes }) {
   }
   const grad = g.createLinearGradient(80, 0, S - 80, 0);
   grad.addColorStop(0, c0); grad.addColorStop(0.5, c1); grad.addColorStop(1, c2);
-  const font = (w, px) => `${w} ${px}px Sora, system-ui, sans-serif`;
+  const font = (w, px) => `${w} ${px}px Sora, "Twemoji Country Flags", system-ui, sans-serif`;
   g.textBaseline = "alphabetic";
   g.font = font(800, 64); g.fillStyle = grad; g.fillText("boarding past", 80, 150);
   const years = vis.map(f => f.year);
@@ -3106,12 +3325,72 @@ function shareStatsCard(vis, { km, min, apCodes }) {
   g.fillStyle = grad; g.fillRect(80, S - 120, S - 160, 4);
   g.font = font(600, 26); g.fillStyle = "rgba(255,255,255,.6)"; g.fillText("BEEN THERE, FLOWN THAT", 80, S - 66);
   c.toBlob(blob => {
-    const name = `boarding-past-my-travels-${localIso(new Date())}.png`, file = new File([blob], name, { type: "image/png" });
-    if (matchMedia("(pointer: coarse)").matches && navigator.canShare && navigator.canShare({ files: [file] }))
-      navigator.share({ files: [file], title: "My travels" }).catch(e => { if (e.name !== "AbortError") downloadBlob(blob, name); });
-    else downloadBlob(blob, name);
+    openShare(blob, `boarding-past-my-travels-${localIso(new Date())}.png`, { what: "My travels · 1080 × 1080" });
   }, "image/png");
 }
+/* ---------- Share: one panel for every image and video ----------
+   A web page can't post into Instagram, TikTok, Facebook or X by itself: those take a file from their own app or from
+   the system's share list. On a phone that can share files, every button opens that list, which holds the apps
+   installed; on a computer (whose list has AirDrop, Mail and the like, not the social apps) a network's button saves
+   the file and opens the network's own page to post it from, and Share… still offers the computer's list. Download
+   always just saves the file. */
+const SHARE_NETS = [
+  ["Instagram", "https://www.instagram.com/", '<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="3.8"/><circle cx="17.2" cy="6.8" r="1.1" class="solid"/>'],
+  ["TikTok", "https://www.tiktok.com/upload", '<path d="M13.5 3.5v11a3.5 3.5 0 1 1-3.5-3.5"/><path d="M13.5 3.5c.4 2.6 2.4 4.4 5 4.6"/>'],
+  ["Facebook", "https://www.facebook.com/", '<path d="M14.5 8H17V4.5h-2.5c-2.6 0-4 1.6-4 4.1V11H8v3.4h2.5V21H14v-6.6h2.6L17 11h-3V8.9c0-.6.2-.9.5-.9z" class="solid"/>'],
+  ["X", "https://x.com/compose/post", '<path d="M4.5 4h4.2l10.8 16h-4.2z"/><path d="M19.2 4l-6.3 7.1M11.1 12.9 4.8 20"/>'],
+  ["WhatsApp", "https://web.whatsapp.com/", '<path d="M4 20.2l1.2-4.1A8.3 8.3 0 1 1 8 18.9z"/><path d="M9.2 8.6c.2 2.8 3.4 6 6.2 6.2l.9-1.4-1.8-.9-.8.8c-1-.4-2.6-2-3-3l.8-.8-.9-1.8z" class="solid"/>'],
+];
+let shareUrl = null;
+function openShare(blob, name, { kind = "image", what = "" } = {}) {
+  const file = new File([blob], name, { type: blob.type || (kind === "video" ? "video/mp4" : "image/png") });
+  let canFiles = false;
+  try { canFiles = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) { /* no file sharing */ }
+  const touch = matchMedia("(pointer: coarse)").matches, note = text => { $("shNote").textContent = text; };
+  const sheet = canFiles && touch;  // a phone's share list holds the social apps; a computer's (AirDrop, Mail…) doesn't
+  if (shareUrl) URL.revokeObjectURL(shareUrl);
+  shareUrl = URL.createObjectURL(blob);
+  $("shPrev").replaceChildren(kind === "video"
+    ? el("video", { src: shareUrl, muted: true, autoplay: true, loop: true, playsInline: true, "aria-label": "Your video" })
+    : el("img", { src: shareUrl, alt: "Your image" }));
+  const v = $("shPrev").querySelector("video"); if (v) { v.muted = true; v.play().catch(() => {}); }
+  $("shTitle").textContent = kind === "video" ? "Your video is ready" : "Your image is ready";
+  $("shSub").textContent = [what, `${(blob.size / 1048576).toFixed(blob.size < 1048576 ? 2 : 1)} MB`].filter(Boolean).join(" · ");
+  note("");
+  const share = after => navigator.share({ files: [file] })
+    .then(() => note(after || "Shared."))
+    .catch(e => { if (e.name !== "AbortError") note("Sharing didn't work here – use Download instead."); });
+  $("shNative").hidden = !canFiles;
+  $("shNative").replaceChildren(icon("share"), touch ? "Share or save to Photos…" : "Share…");
+  $("shNative").onclick = () => share();
+  $("shNets").replaceChildren(...SHARE_NETS.map(([label, url, glyph]) => {
+    const b = el("button", { type: "button", class: "share-net", "aria-label": sheet ? `Share to ${label}` : `Save, then open ${label}` }, el("span", { text: label }));
+    b.insertAdjacentHTML("afterbegin", `<svg viewBox="0 0 24 24" aria-hidden="true">${glyph}</svg>`);
+    b.onclick = () => {
+      if (sheet) { note(`Choose ${label} in the list.`); share(`Sent to the share list – finish in ${label}.`); return; }
+      downloadBlob(blob, name);
+      window.open(url, "_blank", "noopener");
+      note(`Saved ${name}. ${label} is opening in a new tab: post it from there, picking the file in your Downloads.`);
+    };
+    return b;
+  }));
+  $("shHow").textContent = sheet ? "Each one opens your phone's share list, with the apps you have."
+                                    : "Each one saves the file, then opens the site to post it from.";
+  $("shSave").replaceChildren(icon("download"), touch && canFiles ? "Save to Files" : "Download");
+  $("shSave").onclick = () => { downloadBlob(blob, name); note(`Saved ${name}.`); };
+  $("shareModal").hidden = false;
+  $("shClose").replaceChildren(icon("close"));
+  (canFiles ? $("shNative") : $("shNets").firstElementChild).focus();
+}
+function closeShare() {
+  if ($("shareModal").hidden) return;
+  $("shareModal").hidden = true;
+  $("shPrev").replaceChildren();
+  if (shareUrl) { URL.revokeObjectURL(shareUrl); shareUrl = null; }
+}
+$("shClose").addEventListener("click", closeShare);
+$("shareModal").addEventListener("click", e => { if (e.target === e.currentTarget) closeShare(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("shareModal").hidden) { e.stopImmediatePropagation(); closeShare(); } }, true);
 function blobAsData(blob) {
   return new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(blob); });
 }
@@ -3553,23 +3832,13 @@ const dayTag = f => { const n = f.arr_time ? arrDays(f) : 0; return n ? `(${n > 
 function daysUntil(date) {
   return Math.round((Date.parse(date + "T00:00:00Z") - Date.parse(localIso(new Date()) + "T00:00:00Z")) / 864e5);
 }
-function connection(prev, f) {  // layover between two flights of a trip, with warnings
+function connection(prev, f) {  // layover between two flights of a trip
   // with Actual times on, the time you really had: actual gate arrival to actual gate departure (runway times when
   // there is no gate time), so the layover agrees with the times shown on the cards
   const real = state.real.times, ra = real && prev.real && (prev.real.ai || prev.real.on), rd = real && f.real && (f.real.ao || f.real.off);
   const a = ra || flightTimes(prev).arr, d = rd || flightTimes(f).dep;
   const min = a != null && d != null ? Math.round((d - a) / 60e3) : null;
-  const intl = AP[prev.from].country !== AP[prev.to].country || AP[f.from].country !== AP[f.to].country;
-  const warn = [];
-  if (prev.to !== f.from) warn.push(["bad", `Change of airport: land at ${prev.to}, leave from ${f.from}`]);
-  if (min != null && min < 0) warn.push(["bad", "Next flight leaves before this one lands – check the times"]);
-  else if (min != null && min < 60) warn.push(["bad", "Very tight connection"]);
-  else if (min != null && min < 90 && intl) warn.push(["", "Tight for an international connection"]);
-  if (min != null && min >= 360) {
-    const h = airportLocal(f.from, a).hour;
-    warn.push(["", h >= 21 || h < 5 || min >= 600 ? "Long overnight layover" : "Long layover"]);
-  }
-  return { min, warn, actual: !!(ra || rd) };
+  return { min, actual: !!(ra || rd) };
 }
 // a logo on a board tile: the airline's logo without its white box, lightened for the dark board
 const isHome = (code, date) => HOME_AIRPORTS.some(h => h.codes.includes(code) && (!h.from || date >= h.from) && (!h.until || date <= h.until));
@@ -3590,8 +3859,8 @@ function tripFactList(fl, short = false) {  // booked trips too: their fuel and 
   const first = fl[0], last = fl[fl.length - 1], km = fl.reduce((s, f) => s + f.km, 0), air = fl.reduce((s, f) => s + (f.min || 0), 0);
   const t0 = flightTimes(first).dep, t1 = flightTimes(last).arr, known = t0 != null && t1 != null;
   return [["plane", "", `${fl.length} flight${fl.length > 1 ? "s" : ""}`], ["route", "blue", `${fmt(km)} km`, "Distance"],
-                 air ? ["clock", "violet", short ? tight(span(air)) : `${span(air)} in the air`, "Time in the air"] : null,
-                 known && fl.length > 1 ? ["total", "amber", short ? tight(span((t1 - t0) / 60e3)) : `${span((t1 - t0) / 60e3)} total`, "Total time, door to door, layovers included"] : null,
+                 air ? ["air", "violet", short ? tight(span(air)) : `${span(air)} in the air`, "Time in the air"] : null,
+                 known && fl.length > 1 ? ["timer", "amber", short ? tight(span((t1 - t0) / 60e3)) : `${span((t1 - t0) / 60e3)} total`, "Total time, door to door, layovers included"] : null,
                  fl.some(f => f.fuel) ? ["fuel", "red", `${fmt(fl.reduce((s, f) => s + (f.fuel || 0), 0))} L${short ? "" : " fuel"}`, "Your share of the fuel"] : null,
                  fl.some(f => f.co2) ? ["leaf", "green", `${fmt(fl.reduce((s, f) => s + (f.co2 || 0), 0))} kg CO₂`, "Your share of the CO₂"] : null].filter(Boolean);
 }
@@ -3647,13 +3916,15 @@ const IMAGE_FORMATS = {
   story: { name: "Instagram story", size: "1080 × 1920", w: 405, h: 720, scale: 1080 / 405, phone: true, safe: 58 },
 };
 // the stacked passes in the room there is: smaller, and a little wider to make up for it, when a long trip needs it
+// the passes' size in the shared images: 1 = as on the page's cards, laid out narrower and scaled up by this (one step = 0.06)
+const IMAGE_PASS_SCALE = 1.06;
 function fitLegs(legs, room, w, h) {
-  let k = 1;
+  let k = IMAGE_PASS_SCALE;
   for (; ; k -= 0.01) {
     legs.style.width = `${w / k}px`;
     if (legs.offsetHeight * k <= h || k <= 0.45) break;
   }
-  legs.style.transform = k < 1 ? `scale(${k})` : "";
+  legs.style.transform = k !== 1 ? `scale(${k})` : "";
   legs.dataset.k = k;
   room.style.height = `${legs.offsetHeight * k}px`;
 }
@@ -3675,7 +3946,8 @@ function imageFontCss() {
 }
 // Safari (every browser on an iPhone) can leave pictures out of html-to-image's first drawing: it gets a drawing first
 const WEBKIT = /AppleWebKit/.test(navigator.userAgent) && !/Chrome\/|Chromium|Edg\//.test(navigator.userAgent);
-async function makeImage(fl, past, format, step = () => {}) {  // the picture as a PNG blob; step(text): what it is doing now
+async function makeImage(fl, past, format, step = () => {}) {
+  fl = asShown(fl);  // the picture as a PNG blob; step(text): what it is doing now
   const F = IMAGE_FORMATS[format], one = fl.length === 1, wide = format === "horizontal", first = fl[0], last = fl[fl.length - 1];
   const card = el("div", { class: `postcard pc-${format}${F.phone ? " pc-phone" : ""}`, style: `width:${F.w}px;height:${F.h}px` });
   const away = el("div", { class: "postcard-away", "aria-hidden": "true" }, card);  // off screen, by its wrapper: the picture copies the card's own position
@@ -3704,7 +3976,7 @@ async function makeImage(fl, past, format, step = () => {}) {  // the picture as
     legs.querySelectorAll(".upc-lay").forEach(line => {  // always one line: a little smaller when it's long
       for (let px = parseFloat(getComputedStyle(line).fontSize); px > 8.5 && line.scrollWidth > line.clientWidth; px -= 0.5) line.style.fontSize = `${px - 0.5}px`;
     });
-    const roomH = (wide ? F.h : F.h - minMap) - creditH - 2 * pad - safe, passes = [...legs.children];
+    const roomH = ((wide ? F.h : F.h - minMap) - creditH - 2 * pad - safe) * (wide ? 1 : IMAGE_PASS_SCALE), passes = [...legs.children];  // a step larger: the map gives up that room
     fitLegs(legs, room, sideW, roomH);
     let dropped = 0;
     while (legs.offsetHeight * parseFloat(legs.dataset.k) > roomH + 1 && passes.length - dropped > 1) {
@@ -3739,7 +4011,7 @@ async function makeImage(fl, past, format, step = () => {}) {  // the picture as
     away.remove();
   }
 }
-// the menu of a download button: the three formats
+// the menu of a Share button: the image formats
 let imageBusy = false, imageMenuY = 0;
 function closeImageMenu() { if (!imageBusy) $("imgMenu").hidden = true; }
 function openImageMenu(btn, fl, past) {
@@ -3749,7 +4021,7 @@ function openImageMenu(btn, fl, past) {
   closeImageMenu();
   if (open && opener === btn) return;
   menu.opener = btn; imageMenuY = scrollY;
-  menu.replaceChildren(el("small", { text: fl.length === 1 ? "Image of this flight" : "Image of this trip" }), ...Object.entries(IMAGE_FORMATS).map(([key, F]) =>
+  menu.replaceChildren(el("small", { text: fl.length === 1 ? "Share an image of this flight" : "Share an image of this trip" }), ...Object.entries(IMAGE_FORMATS).map(([key, F]) =>
     el("button", { type: "button", role: "menuitem", onclick: async e => {
       e.stopPropagation();
       const item = e.currentTarget;
@@ -3767,21 +4039,10 @@ function openImageMenu(btn, fl, past) {
         imageBusy = false;
       }
       if (!blob) return closeImageMenu();
-      const name = `boarding-past-${fl[0].date}-${fl[0].from}-${fl[fl.length - 1].to}-${key}.png`, file = new File([blob], name, { type: "image/png" });
-      // on a phone, the share sheet: "Save Image" puts it in Photos, where a download only goes to Files. Sharing needs a
-      // fresh tap, and making the image takes longer than a tap counts for, so the menu asks for one
-      if (matchMedia("(pointer: coarse)").matches && navigator.canShare && navigator.canShare({ files: [file] })) {
-        menu.replaceChildren(el("small", { text: "Your image is ready" }),
-          el("button", { type: "button", role: "menuitem", onclick: ev => {
-            ev.stopPropagation();
-            navigator.share({ files: [file] }).catch(e => { if (e.name !== "AbortError") downloadBlob(blob, name); }).finally(closeImageMenu);
-          } }, el("span", { text: "Save to Photos or share" }), el("i", { text: "Save Image is in the list" })),
-          el("button", { type: "button", role: "menuitem", onclick: ev => { ev.stopPropagation(); downloadBlob(blob, name); closeImageMenu(); } },
-            el("span", { text: "Save to Files" }), el("i", { text: "Download" })));
-      } else {
-        downloadBlob(blob, name);
-        closeImageMenu();
-      }
+      // the Share panel: sharing needs a fresh tap, and making the image takes longer than a tap counts for, so the
+      // panel's buttons ask for one
+      closeImageMenu();
+      openShare(blob, `boarding-past-${fl[0].date}-${fl[0].from}-${fl[fl.length - 1].to}-${key}.png`, { what: `${F.name} · ${F.size}` });
     } }, el("span", { text: F.name }), el("i", { text: F.size }))));
   menu.hidden = false;
   const r = btn.getBoundingClientRect(), mw = menu.offsetWidth, mh = menu.offsetHeight;
@@ -3791,9 +4052,26 @@ function openImageMenu(btn, fl, past) {
 document.addEventListener("click", e => { if (!e.target.closest("#imgMenu")) closeImageMenu(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeImageMenu(); });
 addEventListener("scroll", () => { if (Math.abs(scrollY - imageMenuY) > 60) closeImageMenu(); }, { passive: true });  // not for the nudge a click can cause
+// a ▶: first the size, then the video at that size (the same menu as Share image)
+function openPlayMenu(btn, what, start) {
+  const menu = $("imgMenu");
+  if (imageBusy) return;
+  const opener = menu.opener, open = !menu.hidden;
+  closeImageMenu();
+  if (open && opener === btn) return;
+  menu.opener = btn; imageMenuY = scrollY;
+  menu.replaceChildren(el("small", { text: `Video of ${what}` }), ...VIDEO_CHOICES.map(([key, name, size]) =>
+    el("button", { type: "button", role: "menuitem", onclick: e => { e.stopPropagation(); closeImageMenu(); $("videoFormat").value = key; start(); } },
+      el("span", { text: name }), el("i", { text: size }))));
+  menu.hidden = false;
+  const r = btn.getBoundingClientRect(), mw = menu.offsetWidth, mh = menu.offsetHeight;
+  menu.style.left = `${Math.max(8, Math.min(innerWidth - mw - 8, r.right - mw))}px`;
+  menu.style.top = `${r.bottom + mh + 8 > innerHeight ? Math.max(8, r.top - mh - 6) : r.bottom + 6}px`;
+}
+const videoMenu = (fl, what) => e => { e.stopPropagation(); openPlayMenu(e.currentTarget, what, () => openVideo(fl)); };
 // the button, beside the play button and in its colours
-const imageButton = (fl, past, size) => el("button", { class: `play-sm ${size} img-btn`, type: "button", title: "Download an image", "aria-label": "Download an image", "aria-haspopup": "menu",
-  onclick: e => { e.stopPropagation(); openImageMenu(e.currentTarget, fl, past); } }, icon("image"));
+const imageButton = (fl, past, size) => el("button", { class: `play-sm ${size} img-btn`, type: "button", title: "Share an image", "aria-label": "Share an image", "aria-haspopup": "menu",
+  onclick: e => { e.stopPropagation(); openImageMenu(e.currentTarget, fl, past); } }, icon("share"));
 // A trip's route map, beside its boarding passes: what the main map shows when filtered to that trip, in its Map style.
 // One hidden map draws them as pictures, only for the trips near the screen (the browser allows few live maps at once)
 const SHOT_W = 560, SHOT_H = 420, SHOTS_KEPT = 40, tripShots = new Map(), shotsNear = new Set();
@@ -4086,7 +4364,7 @@ function tripHeader(t, fl, past, extra = null) {
     el("div", { class: "upc-actions" }, extra,
       past ? null : button("calendar", "Add to calendar", "Calendar file for Apple, Google or Outlook calendars",
         () => downloadBlob(new Blob([tripIcs(fl)], { type: "text/calendar" }), `flights-${first.date}-${dest}.ics`)),
-      el("button", { class: "play-sm trip", type: "button", title: "Play trip video", "aria-label": "Play trip video", onclick: e => { e.stopPropagation(); openVideo(fl); } }, icon("play")),
+      el("button", { class: "play-sm trip", type: "button", title: "Play trip video", "aria-label": "Play trip video", "aria-haspopup": "menu", onclick: videoMenu(fl, "this trip") }, icon("play")),
       imageButton(fl, past, "trip")),
     tripLine(fl, !past, true));
 }
@@ -4099,9 +4377,7 @@ function layoverBar(f, link = null, cls = "upc-lay") {
   const name = leg[1].flight_no || leg[1].to, go = link && link(leg[1]), sym = () => airlineSymbol(leg[1].airline, "sm");
   return el("div", { class: cls, title: ok ? (c.actual ? "From the actual gate times (Actual times on)" : "From the scheduled times") : "" }, icon("clock"),
     el("span", {}, ok ? el("b", { text: span(c.min) }) : null, ok ? ` layover in ${city}` : `Connection in ${city}`,
-      link ? " · then " : null, !link ? null : go ? el("button", { class: "lay-next", type: "button", title: `Go to ${name}`, onclick: e => { e.stopPropagation(); go(); } }, sym(), name) : [sym(), name]),
-    ...(f.future ? c.warn.map(([cls, txt]) => el("span", { class: "upc-warn " + cls, title: "A check on your booked trip, worth knowing before you fly (past trips don't get these)" },
-      icon("warn"), `Booked trip check · ${txt.toLowerCase()}`)) : []));
+      link ? " · then " : null, !link ? null : go ? el("button", { class: "lay-next", type: "button", title: `Go to ${name}`, onclick: e => { e.stopPropagation(); go(); } }, sym(), name) : [sym(), name]));
 }
 let nextLeg = null;
 const NEXT_LEG = () => nextLeg || (nextLeg = new Map(TRIPS.flatMap(t => t.flights.slice(0, -1).map((f, i) => [f.id, [f, t.flights[i + 1]]]))));  // flight id -> [it, the next of its trip]
@@ -4235,7 +4511,7 @@ const DIMS = [
   { key: "data", label: "Real data", get: f => realKind(f), sort: (a, b) => REAL_KINDS.indexOf(a[0]) - REAL_KINDS.indexOf(b[0]), name: k => k },
 ];
 const state = { sel: Object.fromEntries(DIMS.map(d => [d.key, new Set()])), q: "", selectedId: null,
-                sort: { key: "date", dir: -1 }, tab: "stats", view: "map", real: { tracks: false, times: false } };
+                sort: { key: "date", dir: -1 }, tab: "stats", view: "map", real: { tracks: true, times: true } };  // Actual tracks and times on until switched off
 try { Object.assign(state.real, JSON.parse(localStorage.getItem("flightmap.real") || "{}")); } catch (e) { /* storage unavailable */ }
 
 // quick search: every word must appear in the flight's number, registration, airports, cities, countries, airline,
@@ -4914,7 +5190,11 @@ function logo(airline, fallback = null) {
   if (!code) return fallback;
   const img = el("img", { class: "logo", src: logoUrl(code, 120, 48), loading: "lazy", alt: airline, title: airline, "data-code": code });
   img.addEventListener("error", () => fallback ? img.replaceWith(fallback) : img.remove());
-  logoVariants(code).then(v => { if (v) img.src = v.light; });  // cut to the logo; dark pages show it on a light chip (CSS)
+  logoVariants(code).then(v => {  // cut to the logo; on a dark page its dark-mode copy where the original would be too dark
+    if (!v) return;
+    img.dataset.light = v.light; img.dataset.dark = v.dark || v.light;
+    img.src = darkPage() ? img.dataset.dark : v.light;
+  });
   return img;
 }
 // Statistics bars: the logo alone (name as tooltip), or the name when there is no logo
@@ -4987,10 +5267,10 @@ const ICONS = {
   play: '<path d="M8 5v14l11-7z" class="solid"/>',
   calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
   clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
-  warn: '<path d="M12 3.8 2.9 19.5h18.2z"/><path d="M12 10v4.4M12 17.1v.2"/>',
   takeoff: '<path d="M3 20.5h18"/><g transform="rotate(62 12 11) translate(0 -1)"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" class="solid"/></g>',
   land: '<path d="M3 20.5h18"/><g transform="rotate(118 12 11) translate(0 -1)"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" class="solid"/></g>',
   download: '<path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/>',
+  share: '<path d="M12 14.5V3.8M7.8 8 12 3.8 16.2 8"/><path d="M5.5 11.5v7a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5v-7"/>',
   plane: '<g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" class="solid"/></g>',
   check: '<path d="M5 12.5 10 17l9-10"/>',
   caret: '<path d="m9 6 6 6-6 6"/>',
@@ -5008,6 +5288,9 @@ const ICONS = {
   fuel: '<path d="M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M3.5 20h12M7.5 8h4M14 10h1.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8.5L17.5 6"/>',  // a fuel pump
   route: '<circle cx="5.2" cy="17" r="2" class="solid"/><circle cx="18.8" cy="7" r="2" class="solid"/><path stroke-dasharray="2.4 3" d="M5.2 17Q6.5 5.7 18.8 7"/>',
   total: '<path d="M6.7 3.5h10.6L6.7 20.5h10.6z"/>',
+  // time in the air: a clock with a plane flying round its rim; total time (door to door): a stopwatch
+  air: '<path d="M11.5 4.6A7.6 7.6 0 1 0 19.4 12.6M11.5 8.6V12.6l2.8 1.9"/><g transform="translate(17.6 6.4) rotate(135) scale(0.52) translate(-12 -12)"><path class="solid" d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></g>',
+  timer: '<path d="M19.6 13.6a7.6 7.6 0 1 1-15.2 0a7.6 7.6 0 1 1 15.2 0M10 2.8h4M12 2.8V6M18.4 7.2l1.5-1.5M12 13.6V9.6"/>',
   trophy: '<path d="M7.5 4h9v6a4.5 4.5 0 0 1-9 0zM12 14.5V19M8.5 20h7M7.5 6H4v1.5A3 3 0 0 0 7 10.5M16.5 6H20v1.5a3 3 0 0 1-3 3"/>',
   gauge: '<path d="M4.2 17a8.5 8.5 0 1 1 15.6 0"/><path d="m12 14 4-5"/><circle cx="12" cy="14.5" r="1.2"/>',
   sparkle: '<path d="M12 3.5 13.8 10.2 20.5 12 13.8 13.8 12 20.5 10.2 13.8 3.5 12 10.2 10.2z"/>',
@@ -5039,14 +5322,33 @@ function makerImages(maker) {
   }
   return makerArt.get(maker);
 }
+// a logo's dark-mode copy (airline sources have none): its dark parts lifted to a light tone of the same hue, the bright
+// parts kept, as airlines do for their own dark-mode logos. needsLift: whether enough of it is too dark to read on a dark page
+// too dark on a dark page: under 3:1 contrast against it (relative luminance below about 0.12), so deep reds and navy count
+const lin = v => (v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+const tooDark = (r, g, b) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b) < 0.12;
+function needsLift(img) {
+  try {
+    const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height, c = el("canvas", { width: w, height: h }), g = c.getContext("2d");
+    g.drawImage(img, 0, 0);
+    const p = g.getImageData(0, 0, w, h).data;
+    let solid = 0, dark = 0;
+    for (let i = 0; i < p.length; i += 4) {
+      if (p[i + 3] < 24) continue;  // soft and faded parts count too
+      solid++;
+      if (tooDark(p[i], p[i + 1], p[i + 2])) dark++;
+    }
+    return solid > 0 && dark / solid > 0.05;  // even a small dark part (a name under a bright symbol) gets the copy: only the dark parts change
+  } catch (e) { return false; }
+}
 function liftDark(img) {
-  const c = el("canvas", { width: img.naturalWidth, height: img.naturalHeight }), g = c.getContext("2d");
+  const c = el("canvas", { width: img.naturalWidth || img.width, height: img.naturalHeight || img.height }), g = c.getContext("2d");
   g.drawImage(img, 0, 0);
   const d = g.getImageData(0, 0, c.width, c.height), p = d.data;
   for (let i = 0; i < p.length; i += 4) {
     if (!p[i + 3]) continue;
     const r = p[i] / 255, gr = p[i + 1] / 255, b = p[i + 2] / 255, max = Math.max(r, gr, b), min = Math.min(r, gr, b), l = (max + min) / 2;
-    if (l >= 0.42) continue;
+    if (!tooDark(p[i], p[i + 1], p[i + 2])) continue;
     const L = 0.7 + l * 0.3, k = max === min ? 0 : (L < 0.5 ? L : 1 - L) / (l < 0.5 ? l : 1 - l);  // same hue and saturation, lighter
     for (let j = 0; j < 3; j++) p[i + j] = Math.round(Math.min(1, Math.max(0, L + ((p[i + j] / 255) - l) * k)) * 255);
   }
@@ -5111,7 +5413,7 @@ function logoVariants(code) {
     img.onload = () => idle(() => {  // the pixel work waits for an idle moment, so scrolling and clicks stay smooth
       try {
         const light = trimCanvas(clearWhiteBox(img));
-        done({ light: light.toDataURL(), color: brandColour(light) });  // dark pages show it on a light chip: no dark version needed
+        done({ light: light.toDataURL(), dark: needsLift(light) ? liftDark(light).toDataURL() : null, color: brandColour(light) });
       } catch (e) { done(null); }  // unreadable image: shown as it is
     });
     img.onerror = () => done(null);
@@ -5178,7 +5480,7 @@ function flightPopup(f) {
     `${fmt(f.km)} km · ${hm(f.min)} h`, el("br"),
     ...(state.real.times && f.real ? [realLine(f), el("br")] : []),
     typeLabel(f.model || f.aircraft), " ", [f.reg && regLabel(f.reg), f.age != null ? `${aboutAge(f)}${f.age} year${f.age === 1 ? "" : "s"} old` : null].filter(Boolean).join(" · "), el("br"),
-    el("div", { class: "pop-actions" }, el("button", { class: "play-sm pop-play", type: "button", title: "Play flight video", "aria-label": "Play flight video", onclick: () => openVideo([f]) }, icon("play")),
+    el("div", { class: "pop-actions" }, el("button", { class: "play-sm pop-play", type: "button", title: "Play flight video", "aria-label": "Play flight video", "aria-haspopup": "menu", onclick: videoMenu([f], "this flight") }, icon("play")),
       imageButton([f], !f.future, "pop-play")));
 }
 // day & night (Map style option): today's night side shaded, with the city lights glowing there; redrawn every 10 minutes
@@ -5420,26 +5722,37 @@ function timeIcon(k) {
   s.innerHTML = `<svg viewBox="0 0 24 24">${TIME_ICONS[k]}</svg>`;
   return s;
 }
+// the times of one end of a flight as [icon, time, actual?, tooltip] parts and its day tag (days after the date shown):
+// Actual times off (or no data): the scheduled time with the take-off / landing icon; on: gate then take-off at the
+// departure, landing then gate at the arrival, the logged time where there is no actual gate time
+function timeParts(f, key, base = 0) {
+  const dep = key === "time", r = f.real, recorded = (f.sched ? f.sched[key] : f[key]) || "";
+  const gate = dep ? "out" : "in", runway = dep ? "off" : "on", code = dep ? f.from : (r && r.div) || f.to;
+  if (!state.real.times || !r) {
+    const n = dep ? 0 : (f.arr_time ? arrDays(f) : 0) - base;
+    return { parts: recorded ? [[runway, recorded, false, `${dep ? "Departure" : "Arrival"} (scheduled, local time)`]] : [], day: n, real: false };
+  }
+  const src = r.src === "opensky" ? "OpenSky" : "FlightAware";
+  const gateMs = r[dep ? "ao" : "ai"], runwayMs = r[runway];
+  const g = gateMs && AP[code] ? [gate, localHm(code, gateMs), true, `Actual ${TIME_NAMES[gate].toLowerCase()} (FlightAware)${recorded ? ` · scheduled ${recorded}` : ""}`]
+          : recorded ? [gate, recorded, false, `${TIME_NAMES[gate]} (scheduled)`] : null;
+  const w = runwayMs && AP[code] ? [runway, localHm(code, runwayMs), true, `Actual ${TIME_NAMES[runway].toLowerCase()} (${src})`] : null;
+  return { parts: (dep ? [g, w] : [w, g]).filter(Boolean), day: realDays(f, dep) - base, real: true };
+}
 const localHm = (code, ms) => { const p = airportLocal(code, ms); return `${String(p.hour).padStart(2, "0")}:${String(p.minute).padStart(2, "0")}`; };
 // A departure or arrival time with its icon. Actual times off: the time as logged (the scheduled gate time).
 // On: both times of that end, in order: gate departure then take-off, landing then gate arrival; the actual ones
 // highlighted (the scheduled time in their tooltip), the logged time where there is no actual gate time
-const realTime = (f, key) => {
-  const dep = key === "time", r = f.real, recorded = (f.sched ? f.sched[key] : f[key]) || "";
-  const gate = dep ? "out" : "in", runway = dep ? "off" : "on", code = dep ? f.from : (r && r.div) || f.to;
-  const pair = (k, text, real, title) => el("span", { class: "t-pair" + (real ? " real-stamp" : ""), title }, timeIcon(k), text);
-  // scheduled times (Actual times off, or no actual data): the take-off / landing icon; the actual times keep theirs
-  if (!state.real.times || !r) return recorded ? [pair(runway, recorded, false, `${dep ? "Departure" : "Arrival"} (scheduled, local time)`)] : [];
-  const src = r.src === "opensky" ? "OpenSky" : "FlightAware";
-  const gateMs = r[dep ? "ao" : "ai"], runwayMs = r[runway];
-  const g = gateMs && AP[code] ? pair(gate, localHm(code, gateMs), true, `Actual ${TIME_NAMES[gate].toLowerCase()} (FlightAware)${recorded ? ` · scheduled ${recorded}` : ""}`)
-          : recorded ? pair(gate, recorded, false, `${TIME_NAMES[gate]} (scheduled)`) : null;
-  const w = runwayMs && AP[code] ? pair(runway, localHm(code, runwayMs), true, `Actual ${TIME_NAMES[runway].toLowerCase()} (${src})`) : null;
+const realTime = (f, key, base = 0, withDay = false) => {  // base: days after the logged date of the date shown beside it
+  const dep = key === "time", { parts, day: n, real } = timeParts(f, key, base);
+  const pair = ([k, text, isReal, title]) => el("span", { class: "t-pair" + (isReal ? " real-stamp" : ""), title }, timeIcon(k), text);
+  if (!real && !withDay) return parts.map(pair);  // the table and the cards add the scheduled day tag themselves where they need it
   // the day of the actual times against the flight's logged date: a departure that slipped past midnight (23:20 planned,
   // left 00:17) shows "(+1d)" like a next-day arrival, so the card doesn't read as a 30-hour flight
-  const n = realDays(f, dep), day = n ? el("span", { class: "fc-day", text: ` (${n > 0 ? "+" : ""}${n}d)`,
-    title: dep ? (n > 0 ? `Left after midnight: ${n === 1 ? "the next day" : n + " days later"} (local time)` : "Left the day before (local time)") : dayTitle(n) }) : null;
-  return dep ? [g, w, day] : [w, g, day];
+  const day = n ? el("span", { class: "fc-day", text: ` (${n > 0 ? "+" : ""}${n}d)`,
+    title: dep ? (n > 0 ? `Left after midnight: ${n === 1 ? "the next day" : n + " days later"} (local time)` : "Left the day before (local time)")
+               : base ? (n > 0 ? "Landed a day later than scheduled (local time)" : "Landed a day earlier than scheduled (local time)") : dayTitle(n) }) : null;
+  return [...parts.map(pair), day];
 };
 // local day of the actual gate (else runway) time at that end, minus the logged date, in days; 0 when unknown
 function realDays(f, dep) {
@@ -5448,8 +5761,6 @@ function realDays(f, dep) {
   const p = airportLocal(code, ms);
   return Math.round((Date.UTC(p.year, p.month - 1, p.day) - Date.parse(f.date + "T00:00:00Z")) / 864e5);
 }
-// the arrival's day tag for cards and the table: realTime() carries it when the actual times are shown
-const cardDayTag = f => state.real.times && f.real ? "" : dayTag(f);
 // arrival date from the departure date and FlightMemory's day offset ("" when only the year or month is known)
 function arrivalDate(f) {
   if (f.date.length !== 10) return "";
@@ -5458,13 +5769,17 @@ function arrivalDate(f) {
   const d = new Date(f.date + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);
 }
+// the table's times: the actual ones stacked, gate time and runway time one above the other
+const stacked = parts => {
+  const pairs = parts.filter(x => x && x.classList && x.classList.contains("t-pair"));
+  return [pairs.length > 1 ? el("span", { class: "t-stack" }, pairs) : pairs[0] || null, ...parts.filter(x => !pairs.includes(x))];
+};
 const COLS = [
   { key: "no", label: "#", num: true, val: f => f.no, cell: f => el("span", { class: "muted", text: f.no }) },
   { key: "date", label: "Departure", val: f => f.sortKey,
-    cell: f => two(f.date, [...realTime(f, "time"), f.future ? plannedTag() : null]) },
+    cell: f => two(f.date, [...stacked(realTime(f, "time")), delayTag(f, "dep"), f.future ? plannedTag() : null]) },
   { key: "arrival", label: "Arrival", val: f => arrivalDate(f) + " " + (f.arr_time || ""),
-    cell: f => two(arrivalDate(f) || "–", [...realTime(f, "arr_time"), cardDayTag(f) ? el("span", { class: "fc-day", text: ` ${dayTag(f)}`, title: dayTitle(arrDays(f)) }) : null,
-                                           delayTag(f) ? " " : null, delayTag(f)]) },
+    cell: f => two(arrivalDate(f) || "–", [...stacked(realTime(f, "arr_time", arrDays(f))), delayTag(f)]) },  // the date shown is the arrival's: no (+1d) unless the actual day differs
   { key: "flight_no", label: "Flight", val: f => f.flight_no || f.airline,
     cell: f => two(el("span", { class: "fno", title: f.airline || "" }, symbolOrMark(f.airline), el("span", { text: f.flight_no || "–" })), null, "flight") },
   { key: "from", label: "Route", val: f => f.from + f.to,
@@ -5477,10 +5792,11 @@ const COLS = [
   { key: "co2", label: "CO₂ / pax", num: true, val: f => f.co2,
     cell: f => el("span", { title: f.co2 ? co2Title() : "" }, two(f.co2 ? fmt(f.co2) + " kg" : "", f.fuel ? fmt(f.fuel) + " L fuel" : "")) },
   { key: "seat", label: "Seat", val: f => f.seat,
-    cell: f => two([f.seat, f.pos].filter(Boolean).join(" ") || "–", [f.class, f.reason].filter(Boolean).join(" · ")) },
+    cell: f => two([f.seat, f.pos].filter(Boolean).join(" ") || "–",  // class and reason one above the other, like the times
+                   el("span", { class: "t-stack" }, ...[f.class, f.reason].filter(Boolean).map(t => el("span", { text: t })))) },
   { key: "actions", label: "", fixed: true, val: () => 0, cell: f => el("span", { class: "row-actions" },
       el("button", { class: "play-sm flight", type: "button", title: "Play flight video", "aria-label": "Play flight video",
-                     onclick: e => { e.stopPropagation(); openVideo([f]); } }, icon("play")),
+                     "aria-haspopup": "menu", onclick: videoMenu([f], "this flight") }, icon("play")),
       imageButton([f], !f.future, "flight")) },
 ];
 // the table never scrolls sideways: the least important columns step aside until it fits (the cards have it all)
@@ -5950,17 +6266,29 @@ function tile(label, value, sub) {
   return el("div", { class: "card tile" }, el("div", { class: "label", text: label, title: label }),
             valueEl(value), sub ? el("div", { class: "sub" }, sub) : null);
 }
-// arrival punctuality from FlightAware: "On time", "+42 min", "Diverted to MEL", "Cancelled"
-function delayTag(f) {
+// punctuality: "On time", "12 min early", "+42 min" at departure (gate, FlightAware) or arrival; "Cancelled" and
+// "Diverted to MEL" (end "status", or with an arrival unless status = false)
+const punct = m => ({ cls: m <= 15 ? "ok" : m <= 60 ? "late" : "bad", text: m < -5 ? `${-m} min early` : m <= 15 ? "On time" : `+${m} min` });
+function delayTag(f, end = "arr", status = true) {
   const r = f.real;
   if (!state.real.times || !r) return null;
-  if (r.canc) return el("span", { class: "delay bad", text: "Cancelled" });
-  if (r.div) return el("span", { class: "delay bad", text: `Diverted to ${r.div}` });
+  if (end === "status" || (end === "arr" && status)) {
+    if (r.canc) return el("span", { class: "delay bad", text: "Cancelled" });
+    if (r.div) return el("span", { class: "delay bad", text: `Diverted to ${r.div}` });
+    if (end === "status") return null;
+  }
+  if (r.canc) return null;
+  if (end === "dep") {
+    if (r.dd == null) return null;
+    const p = punct(r.dd);
+    return el("span", { class: "delay " + p.cls, text: p.text,
+                        title: `Left the gate ${r.dd > 0 ? r.dd + " min after" : r.dd < 0 ? -r.dd + " min before" : "at"} the scheduled departure (FlightAware)` });
+  }
   if (r.ad == null) return null;
-  return el("span", { class: "delay " + (r.ad <= 15 ? "ok" : r.ad <= 60 ? "late" : "bad"),
+  return el("span", { class: "delay " + punct(r.ad).cls,
                       title: r.src === "opensky" || r.runway ? `Landed ${r.ad > 0 ? "+" + r.ad + " min after" : r.ad < 0 ? -r.ad + " min before" : "at"} the scheduled arrival (${r.runway ? "FlightAware" : "OpenSky"})`
-                                                 : `Departure ${r.dd != null ? (r.dd > 0 ? "+" : "") + r.dd + " min" : "–"} · arrival ${r.ad > 0 ? "+" : ""}${r.ad} min (FlightAware)`,
-                      text: r.ad < -5 ? `${-r.ad} min early` : r.ad <= 15 ? "On time" : `+${r.ad} min` });
+                                                 : `Reached the gate ${r.ad > 0 ? r.ad + " min after" : r.ad < 0 ? -r.ad + " min before" : "at"} the scheduled arrival (FlightAware)`,
+                      text: punct(r.ad).text });
 }
 const useTrack = f => state.real.tracks && f.track;
 function trackPoints(f) {  // [lon, lat] from take-off airport through the flown positions to where it landed
@@ -6005,7 +6333,7 @@ function recordFlight(f, head) {
     el("div", { class: "rec-meta" }, f.airline ? logo(f.airline) : null, [f.airline, f.date].filter(Boolean).join(" · "),
       f.model || f.aircraft ? typeLabel(f.model || f.aircraft) : null));
 }
-const REC_KIND = { distance: ["blue", "globe"], time: ["violet", "clock"], co2: ["green", "leaf"], layover: ["amber", "takeoff"], aircraft: ["pink", "plane"], speed: ["red", "gauge"],
+const REC_KIND = { distance: ["blue", "globe"], time: ["violet", "air"], co2: ["green", "leaf"], layover: ["amber", "takeoff"], aircraft: ["pink", "plane"], speed: ["red", "gauge"],
                    real: ["blue", "takeoff"] };
 // one record: its family's colour and icon, name and figure, then the flight; opens the flight on the map
 function recordTile([kind, name, f, value, head]) {
@@ -6041,10 +6369,10 @@ function renderStats(shown) {
     el("button", { type: "button", class: "icon-btn round-btn pp-close", "aria-label": "Close the passport", title: "Close", onclick: e => { e.stopPropagation(); passportOpen(false); } },
       icon("close")),
     passportCard(vis, { km, min, booked, apCodes }),
-    el("div", { class: "pp-actions" }, el("button", { class: "icon-btn", type: "button", title: "Save the passport as a PNG image",
-                                                       onclick: e => downloadPassport(e.currentTarget) }, icon("download"), "Passport image"),
+    el("div", { class: "pp-actions" }, el("button", { class: "icon-btn", type: "button", title: "The passport as an image, to share or save",
+                                                       onclick: e => downloadPassport(e.currentTarget) }, icon("share"), "Passport image"),
       el("button", { class: "icon-btn", type: "button", title: "A square card with your travel figures, to share or save",
-                     onclick: () => shareStatsCard(vis, { km, min, apCodes }) }, icon("download"), "Share my stats")));
+                     onclick: () => shareStatsCard(vis, { km, min, apCodes }) }, icon("share"), "Share my stats")));
 
   const home = countBy(vis, f => [f.from, f.to])[0][0];  // the most visited airport, as on the passport
   const far = [...apCodes].map(c => [c, apKm(home, c)]).sort((a, b) => b[1] - a[1])[0];
@@ -6910,7 +7238,7 @@ function badgesOf(f) {
     };
     const by = (key, ok = x => x[key]) => flown.filter(ok).sort((a, b) => b[key] - a[key]);
     pair(by("km"), "blue", "globe", x => `${fmt(x.km)} km`, "Longest flight", "Shortest flight");
-    pair(by("min"), "violet", "clock", x => `${hm(x.min)} h`, "Longest time aloft", "Shortest time aloft");
+    pair(by("min"), "violet", "air", x => `${hm(x.min)} h`, "Longest time aloft", "Shortest time aloft");
     pair(by("co2"), "green", "leaf", x => `${fmt(x.co2)} kg CO₂`, "Most CO₂", "Least CO₂");
     pair(by("age", x => x.age != null), "pink", "plane", x => aboutAge(x) + ageText(x.age), "Oldest aircraft", "Newest aircraft");
     const speed = x => x.km / x.min * 60;
@@ -6933,28 +7261,28 @@ function badgeRow(f) {
     onclick: e => { e.stopPropagation(); const same = !note.hidden && note.textContent === why; note.hidden = same; note.textContent = why; } }, icon(ic), text)), note);
 }
 function flightCard(f, onPick = x => pickFlight(x.id), foot = null) {
-  const end = (code, key, right, day) => el("div", { class: "fc-end" + (right ? " right" : "") },
+  const end = (code, key, right) => el("div", { class: "fc-end" + (right ? " right" : "") },
     el("div", { class: "fc-code", text: code, title: apTitle(code) }),
     el("div", { class: "fc-ap" + (cityOf(code).length > 13 ? " long" : ""), title: AP[code] ? AP[code].name || cityOf(code) : code }, el("span", { class: "fc-flag", text: `${flagOf(code)} ` }), cityOf(code)),
     el("div", { class: "fc-country", text: `${flagOf(code)} ${AP[code] ? AP[code].country : ""}`.trim() }),
-    el("div", { class: "fc-time" }, ...realTime(f, key),
-      day ? el("span", { class: "fc-day", text: ` ${day}`, title: dayTitle(arrDays(f)) }) : null));
+    el("div", { class: "fc-time" }, ...realTime(f, key, 0, true)),  // gate and runway times on one line, then the day tag
+    (t => t ? el("div", { class: "fc-punct" }, t) : null)(delayTag(f, right ? "arr" : "dep", false)));
   const line = el("div", { class: "fc-line" });
   line.innerHTML = PLANE_SVG;
   const info = (label, main, sub) => el("div", {}, el("small", { text: label }), el("b", {}, main || "–"), el("span", { class: "sub" }, sub && sub.length !== 0 ? sub : ""));
   const art = el("article", { class: "fcard" + (f.id === state.selectedId ? " sel" : "") + (f.future ? " planned" : ""), "data-fid": f.id, tabindex: 0, "data-key-click": "",
                          onclick: () => onPick(f) },
-    el("div", { class: "fc-head" }, symbolOrMark(f.airline),
+    el("div", { class: "fc-head" }, airlineMark(f.airline),  // a boarding pass carries the airline's full logo
       el("span", { class: "fc-flight", text: f.flight_no || f.airline || "", title: f.airline || "" }),
       f.future ? plannedTag() : null,
-      delayTag(f),
+      delayTag(f, "status"),
       el("span", { class: "fc-date", text: niceDate(f.date, false), title: `${niceDate(f.date)} (${f.date})` }),
       el("button", { class: "play-sm flight", type: "button", title: "Play flight video", "aria-label": "Play flight video",
-                     onclick: e => { e.stopPropagation(); openVideo([f]); } }, icon("play")),
+                     "aria-haspopup": "menu", onclick: videoMenu([f], "this flight") }, icon("play")),
       imageButton([f], !f.future, "flight")),
     el("div", { class: "fc-route" }, end(f.from, "time", false),
-      el("div", { class: "fc-mid" }, el("div", { class: "fc-dur", text: [f.min ? hm(f.min) + " h" : "", f.km ? fmt(f.km) + " km" : ""].filter(Boolean).join(" · ") }), line),
-      end(f.to, "arr_time", true, cardDayTag(f))),
+      el("div", { class: "fc-mid" }, el("div", { class: "fc-dur", text: f.min ? hm(f.min) + " h" : "" }), line, el("div", { class: "fc-km", text: f.km ? fmt(f.km) + " km" : "" })),
+      end(f.to, "arr_time", true)),
     badgeRow(f),
     el("div", { class: "fc-foot" },
       info("Aircraft", typeLabel(f.model || f.aircraft), regAge(f)),
@@ -6967,9 +7295,10 @@ function flightCard(f, onPick = x => pickFlight(x.id), foot = null) {
 }
 const CARD_PAGE = 60;
 let cardLimit = CARD_PAGE;
-let view = "cards", group = "flights";  // view: Cards | Table; group: All flights | By trip
+let view = "table", group = "trips";  // view: Cards | Table; group: All flights | By trip (the Travel log opens on trips, as a list)
 try {
-  view = localStorage.getItem("flightmap.view") === "table" ? "table" : "cards";
+  view = localStorage.getItem("flightmap.view") === "cards" ? "cards" : "table";
+  group = localStorage.getItem("flightmap.group") === "flights" ? "flights" : "trips";
 } catch (e) { /* storage unavailable */ }
 // brings a row to the middle of the window
 function scrollToRow(row) {
@@ -7070,6 +7399,7 @@ function syncListControls() {
     $("sortDir").addEventListener("click", () => { state.sort = { ...state.sort, dir: -state.sort.dir }; renderTable(filtered()); });
     document.querySelectorAll("#groupSeg button").forEach(b => b.addEventListener("click", () => {
       group = b.dataset.group;
+      try { localStorage.setItem("flightmap.group", group); } catch (e) { /* storage unavailable */ }
       renderTable(filtered());
     }));
     document.querySelectorAll("#listSeg button").forEach(b => b.addEventListener("click", () => {
@@ -7091,8 +7421,11 @@ function syncListControls() {
 
 /* ---------- flight video (animated route over the globe, recordable) ---------- */
 const D3_JS = "https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js";
-const VIDEO_FORMATS = { story: [720, 1280], landscape: [1280, 720], square: [1080, 1080] };
-const EXPORT_FORMATS = { story: [1080, 1920], landscape: [1920, 1080], square: [1080, 1080] };  // downloads
+const VIDEO_FORMATS = { story: [720, 1280], iphone: [720, 1560], horizontal: [1080, 720], vertical: [720, 1080], landscape: [1280, 720], square: [1080, 1080] };
+const EXPORT_FORMATS = { story: [1080, 1920], iphone: [1080, 2340], horizontal: [1620, 1080], vertical: [1080, 1620], landscape: [1920, 1080], square: [1080, 1080] };  // downloads (iPhone: its 19.5:9 screen; postcards 3:2)
+// the sizes a ▶ offers first, as the Share image menu does
+const VIDEO_CHOICES = [["story", "Instagram story / Reel", "1080 × 1920"], ["iphone", "iPhone", "1080 × 2340"],
+                       ["horizontal", "Postcard, horizontal", "1620 × 1080"], ["vertical", "Postcard, vertical", "1080 × 1620"]];
 const FPS = 30;
 const MP4_MUXER = "https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.min.js";
 const CLOUDS_IMG = "https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/example/clouds/clouds.png";
@@ -7154,7 +7487,7 @@ function openVideo(flights, title, cards = true, fromReel = false) {
   else if ($("videoCardTheme").value === "off") $("videoCardTheme").value = savedCardTheme();
   video.cards = cards;
   if (style.dayNight) $("videoNight").checked = true;  // Map style's day & night carries over
-  video.flights = [...flights].sort((a, b) => a.sortKey < b.sortKey ? -1 : 1);
+  video.flights = asShown([...flights]).sort((a, b) => a.sortKey < b.sortKey ? -1 : 1);
   video.past = !video.flights.some(f => f.future);
   video.title = title || tripTitle(video.flights);
   video.kicker = tripKicker(video.flights);
@@ -7567,7 +7900,7 @@ function videoCountries(m) {
 // Portrait: the view centre sits above the flight panel (padding)
 function aimVideoMap(m, st, W, H) {
   const L = videoLayout(W, H, video.flights.length);
-  const minR = L.portrait ? (L.panel.y - L.titleBottom) * 0.48 : Math.min(W, H) * 0.42;
+  const minR = (L.panel.y - L.titleBottom) * 0.48;
   const R = Math.max(minR, W * EARTH_KM / st.km);
   let zoom = Math.log2(2 * Math.PI * R / 512);
   m.jumpTo({ center: st.centre, zoom, padding: { top: 0, left: 0, right: 0, bottom: Math.min(H * 0.8, 2 * L.shift) } });
@@ -7626,13 +7959,14 @@ async function settleTiles() {
   if (video.vmap) await mapSettled(video.vmap, 600);
 }
 function waitForLogos() {
-  const imgs = [...new Set(video.flights.map(f => DATA.logos[f.airline]).filter(Boolean))].map(c => video.logos[c]).filter(Boolean);
+  const imgs = [...new Set(video.flights.map(f => DATA.logos[f.airline]).filter(Boolean))].map(c => video.logos[c]).filter(Boolean)
+    .concat(Object.keys(TIME_ICONS).flatMap(k => ["dark", "light"].map(m => timeIconImage(k, themeTokens(m).muted, themeTokens(m).card))));  // as the cards draw them
   const loaded = Promise.all(imgs.map(img => img.complete ? null : new Promise(res => { img.onload = img.onerror = res; })));
   return Promise.race([loaded, sleep(3000)]);
 }
 
-function logoImage(airline) {
-  const sym = DATA.symbols && DATA.symbols[airline];
+function logoImage(airline, wordmark = false) {  // wordmark: the airline's full logo even where it has a symbol
+  const sym = !wordmark && DATA.symbols && DATA.symbols[airline];
   if (sym) {
     if (!video.logos["sym:" + airline]) { const img = new Image(); img.src = sym; video.logos["sym:" + airline] = img; }
     const img = video.logos["sym:" + airline];
@@ -7650,9 +7984,26 @@ function logoImage(airline) {
   return img.complete && img.naturalWidth ? img : null;
 }
 
+// a video logo's dark-mode copy (the original when it reads well on a dark card)
+function videoDarkLogo(c) {
+  video.darkLogos = video.darkLogos || new Map();
+  if (!video.darkLogos.has(c)) video.darkLogos.set(c, needsLift(c) ? liftDark(c) : c);
+  return video.darkLogos.get(c);
+}
+// the page's time icons (gate, take-off, landing, gate) as images for the video cards, in a colour
+function timeIconImage(k, colour, cut = "#000") {
+  const key = k + colour + cut;
+  video.timeIcons = video.timeIcons || {};
+  if (!video.timeIcons[key]) {
+    const img = new Image();
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="96" height="96"><style>*{fill:none;stroke:${colour};stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.solid{fill:${colour};stroke:none}.dash{stroke:${cut};stroke-width:1.1;stroke-linecap:butt}</style>${TIME_ICONS[k]}</svg>`);
+    video.timeIcons[key] = img;
+  }
+  return video.timeIcons[key];
+}
 // a logo for the video cards, plain like on the page: in its own colours, with an opaque white background cleared
 function videoLogo(airline) {
-  const img = logoImage(airline);
+  const img = logoImage(airline, true);
   if (!img) return null;
   video.plainLogos = video.plainLogos || new Map();
   if (!video.plainLogos.has(img)) {
@@ -7666,7 +8017,7 @@ function videoLogo(airline) {
         g.putImageData(d, 0, 0);
       }
     } catch (e) { /* unreadable image: drawn as it is */ }
-    video.plainLogos.set(img, c);
+    video.plainLogos.set(img, (() => { try { return trimCanvas(c); } catch (e) { return c; } })());  // cut to the logo, like the page
   }
   return video.plainLogos.get(img);
 }
@@ -7698,7 +8049,7 @@ function drawVideoFrame(ctx, W, H, plan, t) {
   } else {
     const L = videoLayout(W, H, plan.legs.length);
     // smallest globe: fits the frame, or in portrait the band between the title and the flight panel
-    const minR = L.portrait ? (L.panel.y - L.titleBottom) * 0.48 : Math.min(W, H) * 0.42;
+    const minR = (L.panel.y - L.titleBottom) * 0.48;
     const R = Math.max(minR, W * EARTH_KM / st.km);
     const cy = H / 2 - L.shift;  // portrait: centre the view above the flight panel
     const proj = d3.geoOrthographic().translate([W / 2, cy]).scale(R).rotate([-st.centre[0], -st.centre[1]]).clipAngle(90);
@@ -7940,6 +8291,21 @@ function drawVideoOverlay(ctx, W, H, plan, t, st, project, onFront) {
   if (sum > 0) drawTripSummary(ctx, W, L, plan, t, sum, sans);
 }
 
+// the video's figure icons, as on the page: centred on x, y, s across, in a colour
+function factIcon(ctx, U, name, x, y, s, colour) {
+  ctx.save(); ctx.translate(x, y); ctx.strokeStyle = ctx.fillStyle = colour; ctx.lineWidth = 1.6 * U; ctx.lineCap = ctx.lineJoin = "round";
+  const r = s / 2, grid = () => { const k = s / 24; ctx.scale(k, k); ctx.translate(-12, -12); ctx.lineWidth /= k; };  // the page's 24-unit icons
+  if (name === "route") { ctx.beginPath(); ctx.arc(-r * 0.75, r * 0.55, 2 * U, 0, 7); ctx.arc(r * 0.75, -r * 0.55, 2 * U, 0, 7); ctx.fill();
+                          ctx.setLineDash([2.2 * U, 2.6 * U]); ctx.beginPath(); ctx.moveTo(-r * 0.75, r * 0.55); ctx.quadraticCurveTo(-r * 0.6, -r * 0.7, r * 0.75, -r * 0.55); ctx.stroke(); ctx.setLineDash([]); }
+  if (name === "fuel") { const k = s / 24; ctx.scale(k, k); ctx.translate(-12, -12); ctx.lineWidth /= k; ctx.stroke(new Path2D("M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M3.5 20h12M7.5 8h4M14 10h1.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8.5L17.5 6")); }  // a fuel pump, as on the page
+  if (name === "leaf") { const k = s / 24; ctx.scale(k, k); ctx.translate(-12, -12); ctx.lineWidth /= k; ctx.stroke(new Path2D("M5 19c0-9 6-14 15-14 0 9-5 15-14 15M5 19 13 11")); }
+  if (name === "plane" && PLANE_PATH) { const k = s / 24; ctx.rotate(Math.PI / 2); ctx.scale(k, k); ctx.translate(-12, -12); ctx.fill(PLANE_PATH); }
+  if (name === "timer") { grid(); ctx.stroke(new Path2D("M19.6 13.6a7.6 7.6 0 1 1-15.2 0a7.6 7.6 0 1 1 15.2 0M10 2.8h4M12 2.8V6M18.4 7.2l1.5-1.5M12 13.6V9.6")); }
+  if (name === "air") { grid(); ctx.stroke(new Path2D("M11.5 4.6A7.6 7.6 0 1 0 19.4 12.6M11.5 8.6V12.6l2.8 1.9"));
+                        if (PLANE_PATH) { ctx.translate(17.6, 6.4); ctx.rotate(Math.PI * 0.75); ctx.scale(0.52, 0.52); ctx.translate(-12, -12); ctx.fill(PLANE_PATH); } }
+  if (name === "globe") { grid(); ctx.stroke(new Path2D("M20.5 12a8.5 8.5 0 1 1-17 0a8.5 8.5 0 1 1 17 0M3.5 12h17M12 3.5c2.5 2.6 3.7 5.4 3.7 8.5s-1.2 5.9-3.7 8.5c-2.5-2.6-3.7-5.4-3.7-8.5s1.2-5.9 3.7-8.5z")); }
+  ctx.restore();
+}
 const TONES = { blue: "#3b82f6", violet: "#8b5cf6", green: "#10b981", amber: "#f59e0b", pink: "#ec4899", red: "#ef4444" };  // as .tone-* in the CSS
 function drawVideoHud(ctx, W, U, L, P, plan, st, flownKm, flownMin, flownFuel, sans) {
   const pad = L.side, ty = L.top, right = W - pad, sora = (wt, px) => `${wt} ${Math.round(px * U)}px Sora, "Twemoji Country Flags", system-ui, sans-serif`;
@@ -7971,18 +8337,7 @@ function drawVideoHud(ctx, W, U, L, P, plan, st, flownKm, flownMin, flownFuel, s
   ctx.shadowColor = "transparent";
   // stat chips: the trip's figures, in the colours they have on the page; a value counts up as the trip goes
   const toRgb = c => c.startsWith("#") ? rgb(c) : [255, 255, 255];
-  const icon = (name, x, y, s, colour) => {  // y: centre
-    ctx.save(); ctx.translate(x, y); ctx.strokeStyle = ctx.fillStyle = colour; ctx.lineWidth = 1.6 * U; ctx.lineCap = ctx.lineJoin = "round";
-    const r = s / 2;
-    if (name === "route") { ctx.beginPath(); ctx.arc(-r * 0.75, r * 0.55, 2 * U, 0, 7); ctx.arc(r * 0.75, -r * 0.55, 2 * U, 0, 7); ctx.fill();
-                            ctx.setLineDash([2.2 * U, 2.6 * U]); ctx.beginPath(); ctx.moveTo(-r * 0.75, r * 0.55); ctx.quadraticCurveTo(-r * 0.6, -r * 0.7, r * 0.75, -r * 0.55); ctx.stroke(); ctx.setLineDash([]); }
-    if (name === "total") { ctx.beginPath(); ctx.moveTo(-r * 0.7, -r); ctx.lineTo(r * 0.7, -r); ctx.lineTo(-r * 0.7, r); ctx.lineTo(r * 0.7, r); ctx.closePath(); ctx.stroke(); }
-    if (name === "clock") { ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.moveTo(0, -r * 0.55); ctx.lineTo(0, 0); ctx.lineTo(r * 0.4, r * 0.3); ctx.stroke(); }
-    if (name === "fuel") { const k = s / 24; ctx.scale(k, k); ctx.translate(-12, -12); ctx.lineWidth /= k; ctx.stroke(new Path2D("M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M3.5 20h12M7.5 8h4M14 10h1.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8.5L17.5 6")); }  // a fuel pump, as on the page
-    if (name === "leaf") { const k = s / 24; ctx.scale(k, k); ctx.translate(-12, -12); ctx.lineWidth /= k; ctx.stroke(new Path2D("M5 19c0-9 6-14 15-14 0 9-5 15-14 15M5 19 13 11")); }
-    if (name === "plane" && PLANE_PATH) { const k = s / 24; ctx.rotate(Math.PI / 2); ctx.scale(k, k); ctx.translate(-12, -12); ctx.fill(PLANE_PATH); }
-    ctx.restore();
-  };
+  const icon = (name, x, y, s, colour) => factIcon(ctx, U, name, x, y, s, colour);
   // sizeFor: the widest the value gets, so the chip keeps its size; cell: a grid cell's width (the chip fills it)
   const chip = (x, y, h, name, text, sizeFor, tone, cell = 0) => {
     const [tr, tg, tb] = toRgb(TONES[tone] || P.accent), mix = v => Math.round(v * 0.62 + 255 * 0.38);
@@ -8002,29 +8357,29 @@ function drawVideoHud(ctx, W, U, L, P, plan, st, flownKm, flownMin, flownFuel, s
   const lays = plan.legs.map((l, j) => j ? layoverMin(plan.legs[j - 1], l) : 0);
   const passed = lays.slice(0, i + 1).reduce((a, m) => a + (m || 0), 0);
   const tight = m => span(m).replace(/ d\b/, "d").replace(/ h$/, "h");
-  const live = { plane: `Flight ${i + 1} / ${n}`, route: `${fmt(flownKm)} km`, clock: tight(flownMin),
-                 total: tight(flownMin + passed), fuel: `${fmt(flownFuel)} L`, leaf: `${fmt(sofar("co2"))} kg CO₂` };
+  const live = { plane: `Flight ${i + 1} / ${n}`, route: `${fmt(flownKm)} km`, air: tight(flownMin),
+                 timer: tight(flownMin + passed), fuel: `${fmt(flownFuel)} L`, leaf: `${fmt(sofar("co2"))} kg CO₂` };
   // three figures while it plays (flight n of m, distance and time flown; for one flight, CO₂ in place of the count),
   // the same as the trip on the page, which they reach once it has landed; the rest is in the summary at the end
-  const keep = n > 1 ? ["plane", "route", "clock"] : ["route", "clock", "leaf"];
+  const keep = n > 1 ? ["plane", "route", "air", "timer"] : ["route", "air", "leaf"];
   const chips = tripFactList(video.flights, true).filter(([name]) => keep.includes(name))
     .map(([name, tone, text]) => [name, landed ? text : live[name], name === "plane" ? `Flight ${n} / ${n}` : text, tone]);
   // the narrow frames (9:16, square): one frosted panel, the figures in white in 3 columns, a small icon each, faint lines between them
   if (L.chipRows) {
-    const shown = chips.slice(0, 3), rows = 1, cellW = (right - pad) / 3, py0 = ty + 54 * U, rowH = 34 * U;
+    const shown = chips.slice(0, 4), cols = shown.length, rows = 1, cellW = (right - pad) / cols, py0 = ty + 54 * U, rowH = 34 * U;
     ctx.save();
     roundRect(ctx, pad, py0, right - pad, rows * rowH + 4 * U, 12 * U);
     ctx.fillStyle = `rgba(${P.shade},0.55)`; ctx.fill();
     ctx.fillStyle = "rgba(255,255,255,0.05)"; ctx.fill();
     ctx.strokeStyle = "rgba(255,255,255,0.12)"; ctx.lineWidth = 1 * U; ctx.stroke();
     ctx.strokeStyle = "rgba(255,255,255,0.08)";
-    for (let c = 1; c < 3; c++) { ctx.beginPath(); ctx.moveTo(pad + c * cellW, py0 + 7 * U); ctx.lineTo(pad + c * cellW, py0 + rows * rowH - 3 * U); ctx.stroke(); }
+    for (let c = 1; c < cols; c++) { ctx.beginPath(); ctx.moveTo(pad + c * cellW, py0 + 7 * U); ctx.lineTo(pad + c * cellW, py0 + rows * rowH - 3 * U); ctx.stroke(); }
     if (rows > 1) { ctx.beginPath(); ctx.moveTo(pad + 10 * U, py0 + rowH + 2 * U); ctx.lineTo(right - 10 * U, py0 + rowH + 2 * U); ctx.stroke(); }
     shown.forEach(([name, text], j) => {
-      const x = pad + (j % 3) * cellW, y = py0 + Math.floor(j / 3) * rowH + rowH / 2 + 2 * U;
-      icon(name, x + 16 * U, y, 13 * U, "rgba(255,255,255,0.6)");
+      const x = pad + j * cellW, y = py0 + rowH / 2 + 2 * U;
+      icon(name, x + 15 * U, y, 15 * U, "rgba(255,255,255,0.6)");
       ctx.font = sans(700, TS.m); ctx.fillStyle = "#ffffff";
-      ctx.fillText(text, x + 30 * U, y + 5.5 * U, cellW - 36 * U);
+      ctx.fillText(text, x + 29 * U, y + 5.5 * U, cellW - 34 * U);
     });
     ctx.restore();
   }
@@ -8162,20 +8517,26 @@ function drawCountryNames(ctx, W, L, st, project, onFront, sans) {
    card is centred, a little narrower than the frame so the buttons cover less of it, and sits 155 px above the bottom;
    the camera centres the action in the band between the title and the card (shift = pixels up). */
 const REEL_SAFE = { top: 210 / 1920, bottom: 155 / 1920, side: 65 / 1080, buttons: 150 / 1080 };  // shares of the height / width
+// iPhone (full screen, 19.5:9): kept to watch or send, nothing of Instagram's on it, so only a small margin for the
+// rounded corners, the Dynamic Island and the home bar
+const PHONE_SAFE = { top: 120 / 2340, bottom: 80 / 2340, side: 54 / 1080, buttons: 0 };
+// vertical postcard (2:3): a picture to keep, a small even margin
+const POSTCARD_SAFE = { top: 54 / 1620, bottom: 54 / 1620, side: 54 / 1080, buttons: 0 };
 // the video's type scale: four sizes (in layout units) for every text over the map
 const TS = { s: 13, m: 16, l: 22, xl: 34 };
 function videoLayout(W, H, legs) {
-  const U = Math.min(W, H) / 720, portrait = H > W * 1.5;
-  const side = portrait ? W * REEL_SAFE.side : 34 * U;
-  const top = portrait ? H * REEL_SAFE.top : 34 * U, bottom = portrait ? H * (1 - REEL_SAFE.bottom) : H - 34 * U;
+  const U = Math.min(W, H) / 720, portrait = H >= W * 1.4;  // 9:16, iPhone and the vertical postcard
+  const M = H > W * 2 ? PHONE_SAFE : H < W * 1.7 ? POSTCARD_SAFE : REEL_SAFE;  // iPhone is taller than 9:16, the postcard shorter
+  const side = portrait ? W * M.side : 34 * U;
+  const top = portrait ? H * M.top : 34 * U, bottom = portrait ? H * (1 - M.bottom) : H - 34 * U;
   const chipRows = W / U < 1000 ? 1 : 0, lineRow = portrait;  // the narrow frames: the figures in a frosted panel and, in 9:16, a row of its own for the journey line
   const titleBottom = top + (128 + chipRows * 8 + (lineRow ? 42 : 0)) * U;  // the head-up display: title, dates, figures, status pill and journey line
   // a strip of boarding-pass cards along the bottom edge (+ room for the layover tag): one card the width of the safe
   // zone in portrait; in 16:9 and square the current card in the middle with its neighbours beside it
-  const cardH = video.cards ? 208 * U : 0, tag = video.cards && legs > 1 ? 20 * U : 0;
-  const cardW = portrait ? W - side - W * REEL_SAFE.buttons : Math.min(W - 2 * side, 470 * U);  // 9:16: a little narrower, for the buttons on the right
+  const cardH = video.cards ? 240 * U : 0, tag = video.cards && legs > 1 ? 20 * U : 0;
+  const cardW = portrait ? W - side - W * M.buttons - (M.buttons ? 0 : side) : Math.min(W - 2 * side, 470 * U);  // 9:16: a little narrower, for the buttons on the right
   const panel = { x: portrait ? (W - cardW) / 2 : side, y: bottom - cardH - tag, w: portrait ? cardW : W - 2 * side, h: cardH + tag, cardY: bottom - cardH, cardH, cardW };
-  const shift = portrait ? Math.max(0, H / 2 - (titleBottom + panel.y) / 2) : 0;
+  const shift = Math.max(0, H / 2 - (titleBottom + panel.y) / 2);  // every format: the action centred between the title and the cards
   return { U, portrait, side, top, bottom, titleBottom, panel, shift, chipRows, lineRow };
 }
 /* The flights as boarding-pass cards (like the map page's flight cards) joined side by side; the strip slides to
@@ -8195,13 +8556,27 @@ function storyStripPosition(plan, t) {  // 0 = first card centred, 1 = second, .
   });
   return p;
 }
+// the page's colour tokens in dark or light mode (read once per theme by switching the mode for a moment, before any paint)
+const pageTokens = {};
+function themeTokens(mode) {
+  const root = document.documentElement, key = mode + root.dataset.palette;
+  if (!pageTokens[key]) {
+    const was = root.getAttribute("data-theme");
+    root.setAttribute("data-theme", mode);
+    const cs = getComputedStyle(root), v = n => cs.getPropertyValue(n).trim();
+    pageTokens[key] = { card: v("--surface-1"), foot: v("--surface-2"), border: v("--border"), ink: v("--text-primary"), text2: v("--text-secondary"),
+                        muted: v("--text-muted"), grid: v("--grid"), plane: v("--series-1") };
+    if (was == null) root.removeAttribute("data-theme"); else root.setAttribute("data-theme", was);
+  }
+  return pageTokens[key];
+}
 // the cards' colours: dark like the map page in dark mode, or light ones (Cards: Light) with the theme's deeper colour for the progress
 function cardInks(plan) {
   const C = pal();
   return plan.lightCards ? { card: "rgba(255,255,255,0.96)", edge: "rgba(28,26,63,0.12)", ink: "#1c1a3f", muted: "rgba(28,26,63,0.62)",
-                             accent: C.ppRoute, dash: "rgba(28,26,63,0.25)", tear: "rgba(28,26,63,0.2)", done: "#16a34a", shadow: "rgba(0,0,0,0.3)" }
+                             accent: C.ppRoute, dash: "rgba(28,26,63,0.25)", tear: "rgba(28,26,63,0.2)", shadow: "rgba(0,0,0,0.3)" }
                          : { card: C.card, edge: C.cardEdge, ink: "#ffffff", muted: C.muted, accent: C.accent, dash: C.dash,
-                             tear: "rgba(255,255,255,0.18)", done: "#86efac", shadow: "rgba(0,0,0,0.45)" };
+                             tear: "rgba(255,255,255,0.18)", shadow: "rgba(0,0,0,0.45)" };
 }
 // a boarding-pass outline (w × h, the tear-off notches at y = notch), as a path
 function passPath(ctx, w, h, notch, U) {
@@ -8213,12 +8588,16 @@ function passPath(ctx, w, h, notch, U) {
   ctx.lineTo(0, notch + r); ctx.arc(0, notch, r, Math.PI / 2, -Math.PI / 2, true);
   ctx.arcTo(0, 0, w, 0, rad); ctx.closePath();
 }
-function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
+// the video passes' text size against the video's type scale (one step = 0.06)
+const VIDEO_PASS_TEXT = 0.94;
+function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans0) {
+  const sans = (wt, px) => sans0(wt, px * VIDEO_PASS_TEXT);
   const cw = P.cardW, ch = P.cardH, gap = 14 * U, y0 = P.cardY, pos = storyStripPosition(plan, t);
   // dark cards like the map page in dark mode, or light ones (Cards: Light) with the theme's deeper colour for the progress
-  const C = pal(), light = plan.lightCards, K = cardInks(plan);
-  const ink = K.ink, muted = K.muted, accent = K.accent;
-  const notch = 130 * U, r = 9 * U;
+  // the same pass as the page and the shared images, in the page's colours (dark, or light with Cards: Light), larger
+  const C = pal(), light = plan.lightCards, K = cardInks(plan), T = themeTokens(light ? "light" : "dark");
+  const ink = T.ink, muted = T.muted, text2 = T.text2, accent = T.plane;
+  const notch = 164 * U, r = 9 * U;
   const x0 = P.x + (P.w - cw) / 2 - pos * (cw + gap);
   const narrow = cw >= P.w - 1;  // 9:16: one card the width of the frame, neighbours only slide through
   if (narrow) { ctx.save(); ctx.beginPath(); ctx.rect(P.x - 2 * U, y0 - 30 * U, P.w + 4 * U, ch + 60 * U); ctx.clip(); }
@@ -8231,64 +8610,90 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
     // card with a notch on each side at the tear-off line
     passPath(ctx, cw, ch, notch, U);
     ctx.shadowColor = K.shadow; ctx.shadowBlur = 18 * U; ctx.shadowOffsetY = 4 * U;
-    ctx.fillStyle = K.card; ctx.fill();
+    ctx.fillStyle = T.card; ctx.fill();
     ctx.shadowColor = "transparent";
-    ctx.strokeStyle = K.edge; ctx.lineWidth = 1 * U; ctx.stroke();
-    // head: logo, flight number, date (✓ once landed)
+    ctx.save(); passPath(ctx, cw, ch, notch, U); ctx.clip();
+    ctx.fillStyle = T.foot; ctx.fillRect(0, notch, cw, ch - notch);  // below the tear-off line, a shade lighter, as on the page
+    const stripe = tailColour(f.airline);  // the airline's colour down the left edge
+    if (stripe) { ctx.fillStyle = stripe; ctx.fillRect(0, 0, 7 * U, ch); }
+    ctx.restore();
+    passPath(ctx, cw, ch, notch, U); ctx.strokeStyle = T.border; ctx.lineWidth = 1.2 * U; ctx.stroke();
+    // head: logo, flight number, date
     const logo = videoLogo(f.airline);
     let hx = 18 * U;
     if (logo) {
-      const lh = 40 * U, lw = Math.min(124 * U, lh * logo.width / logo.height);
-      ctx.drawImage(logo, hx, 11 * U, lw, lh); hx += lw + 16 * U;
+      // the full logo, as on the page: on a dark card its dark-mode copy where the original would be too dark
+      const art = light ? logo : videoDarkLogo(logo);
+      const k = Math.min(124 * U / art.width, 32 * U / art.height), lw = art.width * k, lh = art.height * k;  // fits 124 × 32, its own proportions
+      ctx.drawImage(art, hx, 15 * U + (32 * U - lh) / 2, lw, lh); hx += lw + 16 * U;
     }
-    ctx.font = sans(800, TS.l); ctx.fillStyle = ink;
+    ctx.font = sans(600, TS.l); ctx.fillStyle = ink;
     ctx.fillText(f.flight_no || f.airline || "", hx, 39 * U, cw - hx - 150 * U);
-    ctx.textAlign = "right"; ctx.font = sans(600, TS.m); ctx.fillStyle = muted;
-    const dateTxt = niceDate(f.date, false);
-    ctx.fillText(dateTxt, cw - 18 * U, 37 * U);
-    if (k >= 1) { const dw = ctx.measureText(dateTxt).width; ctx.font = sans(800, TS.m); ctx.fillStyle = K.done; ctx.fillText("✓", cw - 26 * U - dw, 37 * U); }
-    if (k >= 1 && t >= leg.end) {  // stamped on landing: it drops in from a little larger, then sits slightly crooked
-      const a = Math.min(1, (t - leg.end) / 0.35), sc = 1 + 0.5 * (1 - easeInOut(a)), rot = -0.2;
-      ctx.save(); ctx.translate(cw * 0.5, 98 * U); ctx.rotate(rot); ctx.scale(sc, sc); ctx.globalAlpha *= 0.85 * a;
-      ctx.strokeStyle = K.done; ctx.fillStyle = K.done; ctx.lineWidth = 2.4 * U;
-      roundRect(ctx, -62 * U, -19 * U, 124 * U, 38 * U, 8 * U); ctx.stroke();
-      roundRect(ctx, -57 * U, -14 * U, 114 * U, 28 * U, 5 * U); ctx.lineWidth = 1 * U; ctx.stroke();
-      ctx.font = sans(900, TS.m); ctx.textAlign = "center";
-      if ("letterSpacing" in ctx) ctx.letterSpacing = `${3 * U}px`;
-      ctx.fillText("LANDED", 2 * U, 6.5 * U);
-      if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
-      ctx.restore(); ctx.textAlign = "left";
-    }
-    // route: big codes, flag + city, times; dotted line with the plane at the flight's progress
+    ctx.textAlign = "right"; ctx.font = sans(400, TS.m); ctx.fillStyle = text2;
+    ctx.fillText(niceDate(f.date, false), cw - 18 * U, 37 * U);
+    // route: big codes, flag + city, the times on one line as on the page (gate and runway with their icons, then the
+    // day tag), the early / late tags below; the time in the air above the dotted line, the distance below it
     const clip = (txt, w) => {  // cut with … to fit the width (in the current font)
       if (ctx.measureText(txt).width <= w) return txt;
       while (txt.length > 1 && ctx.measureText(txt + "…").width > w) txt = txt.slice(0, -1);
       return txt.trimEnd() + "…";
     };
-    const end = (code, time, right) => {
+    const timesRow = (key, ax, right, y) => {  // returns its width
+      const { parts, day } = timeParts(f, key);
+      const items = parts.map(([k, text]) => ({ k, text }));
+      ctx.font = sans(600, TS.m);
+      const isz = 18 * U, gap = 10 * U, dayTxt = day ? `(${day > 0 ? "+" : ""}${day}d)` : "";
+      const widths = items.map(it => isz + 4 * U + ctx.measureText(it.text).width);
+      ctx.font = sans(600, TS.s); const dw = dayTxt ? ctx.measureText(dayTxt).width + 6 * U : 0;
+      const total = widths.reduce((a, w) => a + w, 0) + gap * Math.max(0, items.length - 1) + dw;
+      let x = right ? ax - total : ax;
+      ctx.textAlign = "left";
+      items.forEach((it, j) => {
+        const img = timeIconImage(it.k, muted, T.card);  // the icons in the muted colour, as on the page
+        if (img.complete && img.naturalWidth) ctx.drawImage(img, x, y - isz + 3 * U, isz, isz);
+        ctx.font = sans(600, TS.m); ctx.fillStyle = ink; ctx.fillText(it.text, x + isz + 4 * U, y);
+        x += widths[j] + gap;
+      });
+      if (dayTxt) { ctx.font = sans(600, TS.s); ctx.fillStyle = muted; ctx.fillText(dayTxt, x - gap + 6 * U, y); }
+      return total;
+    };
+    const tagPill = (tag, ax, right, y) => {  // the page's early / late tag: a thin outline in its colour
+      if (!tag) return;
+      const cls = tag.className.split(" ")[1], dc = { ok: "#22c55e", late: "#f59e0b", bad: "#ef4444" }[cls] || "#22c55e";
+      ctx.font = sans(600, TS.s);
+      const tw = ctx.measureText(tag.textContent).width + 16 * U, th = 20 * U, x = right ? ax - tw : ax;
+      roundRect(ctx, x, y - th / 2, tw, th, th / 2);
+      ctx.strokeStyle = hexA(dc, 0.45); ctx.lineWidth = 1.2 * U; ctx.stroke();
+      ctx.fillStyle = `color-mix(in oklab, ${dc} 55%, ${text2})`;
+      ctx.textAlign = "left"; ctx.fillText(tag.textContent, x + 8 * U, y + 4.5 * U);
+    };
+    const end = (code, key, right) => {
       const ax = right ? cw - 18 * U : 18 * U;
       ctx.textAlign = right ? "right" : "left";
-      ctx.font = sans(800, TS.xl); ctx.fillStyle = ink; ctx.fillText(code, ax, 84 * U);
+      ctx.font = sans(800, TS.xl); ctx.fillStyle = ink; ctx.fillText(code, ax, 86 * U);
       const codeW = ctx.measureText(code).width;
-      ctx.font = sans(600, TS.m); ctx.fillText(clip(`${flagOf(code)} ${cityOf(code)}`.trim(), cw * 0.42), ax, 103 * U);
-      ctx.font = sans(700, TS.m); ctx.fillText(time || "", ax, 122 * U);
+      ctx.font = sans(600, 18); ctx.fillText(clip(`${flagOf(code)} ${cityOf(code)}`.trim(), cw * 0.42), ax, 108 * U);
+      timesRow(key, ax, right, 132 * U);
+      tagPill(delayTag(f, right ? "arr" : "dep", false), ax, right, 150 * U);
+      ctx.textAlign = "left";
       return codeW;
     };
-    const wa = end(f.from, f.time, false), wb = end(f.to, [f.arr_time, dayTag(f)].filter(Boolean).join(" "), true);
-    const lx0 = 18 * U + wa + 18 * U, lx1 = cw - 18 * U - wb - 18 * U, ly = 72 * U;
-    ctx.textAlign = "center"; ctx.font = sans(500, TS.s); ctx.fillStyle = muted;
-    ctx.fillText([f.min ? `${hm(f.min)} h` : "", f.km ? `${fmt(f.km)} km` : ""].filter(Boolean).join(" · "), (lx0 + lx1) / 2, 57 * U, lx1 - lx0);
-    ctx.strokeStyle = K.dash; ctx.lineWidth = 2 * U; ctx.setLineDash([5 * U, 5 * U]);
+    const wa = end(f.from, "time", false), wb = end(f.to, "arr_time", true);
+    const lx0 = 18 * U + wa + 18 * U, lx1 = cw - 18 * U - wb - 18 * U, ly = 74 * U;
+    ctx.textAlign = "center"; ctx.font = sans(400, TS.s); ctx.fillStyle = muted;
+    if (f.min) ctx.fillText(`${hm(f.min)} h`, (lx0 + lx1) / 2, 60 * U, lx1 - lx0);
+    if (f.km) ctx.fillText(`${fmt(f.km)} km`, (lx0 + lx1) / 2, 96 * U, lx1 - lx0);
+    ctx.textAlign = "left";
+    ctx.strokeStyle = T.grid; ctx.lineWidth = 2 * U; ctx.setLineDash([4 * U, 4 * U]);
     ctx.beginPath(); ctx.moveTo(lx0, ly); ctx.lineTo(lx1, ly); ctx.stroke(); ctx.setLineDash([]);
-    if (k > 0) { ctx.strokeStyle = accent; ctx.beginPath(); ctx.moveTo(lx0, ly); ctx.lineTo(lx0 + (lx1 - lx0) * k, ly); ctx.stroke(); }
     if (PLANE_PATH) {
       const s = 26 * U / 24;
       ctx.save(); ctx.translate(lx0 + (lx1 - lx0) * k, ly); ctx.rotate(Math.PI / 2); ctx.scale(s, s); ctx.translate(-12, -12);
       ctx.fillStyle = accent; ctx.fill(PLANE_PATH); ctx.restore();
     }
     // tear-off line and footer: aircraft, seat, CO2, each with a detail line below (as on the page's cards)
-    ctx.strokeStyle = K.tear; ctx.lineWidth = 1.5 * U; ctx.setLineDash([6 * U, 6 * U]);
-    ctx.beginPath(); ctx.moveTo(r + 6 * U, notch); ctx.lineTo(cw - r - 6 * U, notch); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle = T.border; ctx.lineWidth = 2 * U; ctx.setLineDash([6 * U, 5 * U]);
+    ctx.beginPath(); ctx.moveTo(r + 2 * U, notch); ctx.lineTo(cw - r - 2 * U, notch); ctx.stroke(); ctx.setLineDash([]);
     const cols = [["AIRCRAFT", f.model || f.aircraft, [f.reg && regLabel(f.reg), f.age != null ? `${aboutAge(f)}${f.age} yr${f.age === 1 ? "" : "s"} old` : null].filter(Boolean).join(" · "), 0.5],
                   ["SEAT", [f.seat, f.pos].filter(Boolean).join(" ") || "–", [f.class, f.reason].filter(Boolean).join(" · "), 0.27],
                   ["CO₂", f.co2 ? `${fmt(f.co2)} kg` : "–", f.fuel ? `${fmt(f.fuel)} L fuel` : "", 0.23]];
@@ -8296,11 +8701,11 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
     ctx.textAlign = "left";
     for (const [label, value, sub, share] of cols) {
       const w = (cw - 36 * U) * share;
-      ctx.font = sans(700, TS.s); ctx.fillStyle = muted;
-      if ("letterSpacing" in ctx) ctx.letterSpacing = `${0.8 * U}px`;
-      ctx.fillText(label, cx, notch + 22 * U);
+      ctx.font = sans(400, TS.s); ctx.fillStyle = muted;
+      if ("letterSpacing" in ctx) ctx.letterSpacing = `${1.1 * U}px`;
+      ctx.fillText(label, cx, notch + 24 * U);
       if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
-      ctx.font = sans(700, TS.l); ctx.fillStyle = ink;
+      ctx.font = sans(600, TS.l); ctx.fillStyle = ink;
       // the aircraft like on the page: the maker's logo (on a dark card the light copy made for dark backgrounds) in place of its name,
       // then the number and the registration
       const type = f.model || f.aircraft, maker = label === "AIRCRAFT" && type && makerOf(type);
@@ -8315,7 +8720,7 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
       } else {
         ctx.fillText(value || "–", cx, notch + 45 * U, w - 10 * U);
       }
-      if (sub) { ctx.font = sans(500, TS.s); ctx.fillStyle = muted; ctx.fillText(sub, cx, notch + 65 * U, w - 10 * U); }
+      if (sub) { ctx.font = sans(400, TS.s); ctx.fillStyle = text2; ctx.fillText(sub, cx, notch + 65 * U, w - 10 * U); }
       cx += w;
     }
     ctx.restore();
@@ -8336,9 +8741,9 @@ function drawStoryCards(ctx, W, H, U, P, plan, st, t, sans) {
   if (narrow) ctx.restore();
   ctx.textAlign = "left";
 }
-// the end: the whole trip on one boarding pass, its figures counting up while the camera pulls back, then held:
-// the distance large (and how many times round the Earth), below the tear-off line flights, countries, time in the
-// air and CO₂, each with a detail line
+// the end: the whole trip on one boarding pass in the theme's colours, its figures counting up while the camera pulls
+// back, then held: the distance large (and how many times round the Earth), below the tear-off line flights,
+// countries, time in the air and CO₂ in tinted tiles, each with a detail line
 function drawTripSummary(ctx, W, L, plan, t, fade, sans) {
   const U = L.U, K = cardInks(plan), fl = video.flights;
   const w = L.portrait ? L.panel.cardW : Math.min(W - 2 * L.side, 470 * U), h = 208 * U, notch = 130 * U;
@@ -8349,38 +8754,65 @@ function drawTripSummary(ctx, W, L, plan, t, fade, sans) {
   const codes = [...new Set(fl.flatMap(f => [f.from, f.to]))], countries = new Set(codes.map(a => AP[a].country).filter(Boolean)).size;
   const airlines = new Set(fl.map(f => f.airline).filter(Boolean)).size;
   const t0 = flightTimes(fl[0]).dep, t1 = flightTimes(fl[fl.length - 1]).arr, door = t0 != null && t1 != null && fl.length > 1 ? (t1 - t0) / 60e3 : null;
+  // the theme's colours throughout: a glow and a wash of them over the card, a gradient band on top, a gradient
+  // outline, the distance in the gradient, and each figure in a tinted tile in the colour it has on the page
+  const H = pal().holo.slice(0, 3).map(c => isHex(c) ? c : "#7c4dff"), light = plan.lightCards;
+  const grad = (x0, x1) => { const g = ctx.createLinearGradient(x0, 0, x1, 0); H.forEach((c, i) => g.addColorStop(i / 2, c)); return g; };
   ctx.save(); ctx.globalAlpha *= fade; ctx.translate(x, y); ctx.textBaseline = "alphabetic";
   passPath(ctx, w, h, notch, U);
-  ctx.shadowColor = K.shadow; ctx.shadowBlur = 18 * U; ctx.shadowOffsetY = 4 * U; ctx.fillStyle = K.card; ctx.fill();
-  ctx.shadowColor = "transparent"; ctx.strokeStyle = K.edge; ctx.lineWidth = 1 * U; ctx.stroke();
-  const caps = (txt, x0, y0, align = "left") => {
-    ctx.font = sans(700, TS.s); ctx.fillStyle = K.muted; ctx.textAlign = align;
-    if ("letterSpacing" in ctx) ctx.letterSpacing = `${0.8 * U}px`;
+  ctx.shadowColor = hexA(H[1], light ? 0.45 : 0.6); ctx.shadowBlur = 36 * U; ctx.shadowOffsetY = 6 * U; ctx.fillStyle = K.card; ctx.fill();
+  ctx.shadowColor = "transparent";
+  ctx.save(); passPath(ctx, w, h, notch, U); ctx.clip();
+  const wash = ctx.createLinearGradient(0, 0, w, h);
+  wash.addColorStop(0, hexA(H[0], light ? 0.1 : 0.2)); wash.addColorStop(0.5, hexA(H[1], light ? 0.05 : 0.1)); wash.addColorStop(1, hexA(H[2], light ? 0.12 : 0.24));
+  ctx.fillStyle = wash; ctx.fillRect(0, 0, w, h);
+  const band = 38 * U;
+  ctx.fillStyle = grad(0, w); ctx.fillRect(0, 0, w, band);
+  const sheen = ctx.createLinearGradient(0, 0, 0, band); sheen.addColorStop(0, "rgba(255,255,255,0.28)"); sheen.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = sheen; ctx.fillRect(0, 0, w, band);
+  ctx.restore();
+  passPath(ctx, w, h, notch, U); ctx.strokeStyle = grad(0, w); ctx.lineWidth = 1.8 * U; ctx.stroke();
+  const caps = (txt, x0, y0, colour, align = "left") => {
+    ctx.font = sans(800, TS.s); ctx.fillStyle = colour; ctx.textAlign = align;
+    if ("letterSpacing" in ctx) ctx.letterSpacing = `${1.4 * U}px`;
     ctx.fillText(txt, x0, y0);
     if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
   };
-  caps("THE WHOLE TRIP", 18 * U, 34 * U);
-  caps(video.kicker.toUpperCase(), w - 18 * U, 34 * U, "right");
-  ctx.textAlign = "left"; ctx.font = sans(800, TS.xl); ctx.fillStyle = K.ink;
-  const big = `${fmt(Math.round(km * c))} km`;
-  ctx.fillText(big, 18 * U, 92 * U);
-  const bw = ctx.measureText(big).width, laps = km / (2 * Math.PI * EARTH_KM);
-  ctx.font = sans(600, TS.m); ctx.fillStyle = K.muted;
-  ctx.fillText(laps >= 0.1 ? `${(laps * c).toFixed(laps >= 10 ? 0 : laps >= 1 ? 1 : 2)}× around the Earth` : `${codes.length} airports`, 18 * U + bw + 14 * U, 92 * U, w - bw - 50 * U);
+  caps("THE WHOLE TRIP", 18 * U, 24 * U, "#0b0a1f");
+  caps(video.kicker.toUpperCase(), w - 18 * U, 24 * U, "rgba(11,10,31,0.75)", "right");
+  ctx.textAlign = "left"; ctx.font = sans(900, TS.xl);
+  const big = `${fmt(Math.round(km * c))} km`, bw = ctx.measureText(big).width;
+  ctx.save(); ctx.shadowColor = hexA(H[1], 0.55); ctx.shadowBlur = 14 * U; ctx.fillStyle = grad(18 * U, 18 * U + bw); ctx.fillText(big, 18 * U, 92 * U); ctx.restore();
+  const laps = km / (2 * Math.PI * EARTH_KM);
+  const pill = laps >= 0.1 ? `${(laps * c).toFixed(laps >= 10 ? 0 : laps >= 1 ? 1 : 2)}× around the Earth` : `${codes.length} airports`;
+  ctx.font = sans(700, TS.s);
+  const pw = Math.min(ctx.measureText(pill).width + 22 * U, w - bw - 50 * U), px = 18 * U + bw + 14 * U, ph = 26 * U, py = 92 * U - 19 * U;
+  if (pw > 40 * U) {
+    roundRect(ctx, px, py, pw, ph, ph / 2); ctx.fillStyle = hexA(H[2], light ? 0.14 : 0.22); ctx.fill();
+    ctx.strokeStyle = hexA(H[2], 0.6); ctx.lineWidth = 1 * U; ctx.stroke();
+    ctx.fillStyle = K.ink; ctx.fillText(pill, px + 11 * U, py + 17.5 * U, pw - 22 * U);
+  }
   ctx.strokeStyle = K.tear; ctx.lineWidth = 1.5 * U; ctx.setLineDash([6 * U, 6 * U]);
   ctx.beginPath(); ctx.moveTo(15 * U, notch); ctx.lineTo(w - 15 * U, notch); ctx.stroke(); ctx.setLineDash([]);
   const n = v => Math.round(v * c);
-  const cols = [["FLIGHTS", `${n(fl.length)}`, airlines > 1 ? `${airlines} airlines` : `${codes.length} airports`],
-                ["COUNTRIES", `${n(countries)}`, `${codes.length} airports`],
-                ["IN THE AIR", air ? span(Math.max(1, n(air))) : "–", door ? `${span(door)} door to door` : ""],
-                ["CO₂", co2 ? `${fmt(n(co2))} kg` : "–", fuel ? `${fmt(n(fuel))} L fuel` : ""]];
+  // the figures in tinted tiles with the page's icons for labels (no words, so five fit): flights, countries, time in the
+  // air, total time door to door (with connections), CO₂
+  const tight = m => span(m).replace(/ d\b/, "d").replace(/ h$/, "h");
+  const cols = [["plane", `${n(fl.length)}`, airlines > 1 ? `${airlines} airlines` : `${codes.length} airports`, TONES.pink],
+                ["globe", `${n(countries)}`, `${codes.length} airports`, TONES.blue],
+                ["air", air ? tight(Math.max(1, n(air))) : "–", "in the air", TONES.violet],
+                door ? ["timer", tight(Math.max(1, n(door))), "door to door", TONES.amber] : null,
+                ["leaf", co2 ? `${fmt(n(co2))} kg` : "–", fuel ? `${fmt(n(fuel))} L fuel` : "", TONES.green]].filter(Boolean);
   if (cols[0][2] === cols[1][2]) cols[0][2] = "";
-  const cw = (w - 36 * U) / cols.length;
-  cols.forEach(([label, value, sub], j) => {
-    const cx = 18 * U + j * cw;
-    caps(label, cx, notch + 22 * U);
-    ctx.textAlign = "left"; ctx.font = sans(700, TS.l); ctx.fillStyle = K.ink; ctx.fillText(value, cx, notch + 47 * U, cw - 8 * U);
-    if (sub) { ctx.font = sans(500, TS.s); ctx.fillStyle = K.muted; ctx.fillText(sub, cx, notch + 66 * U, cw - 8 * U); }
+  const gap = 8 * U, tw = (w - 30 * U - gap * (cols.length - 1)) / cols.length, ty = notch + 8 * U, th = h - notch - 14 * U;
+  cols.forEach(([name, value, sub, tone], j) => {
+    const tx = 15 * U + j * (tw + gap), [r, g, b] = rgb(tone), lift = v => Math.round(v + (255 - v) * (light ? 0 : 0.45));
+    roundRect(ctx, tx, ty, tw, th, 10 * U);
+    ctx.fillStyle = `rgba(${r},${g},${b},${light ? 0.1 : 0.16})`; ctx.fill();
+    ctx.strokeStyle = `rgba(${r},${g},${b},0.5)`; ctx.lineWidth = 1 * U; ctx.stroke();
+    factIcon(ctx, U, name, tx + 18 * U, ty + 14 * U, 16 * U, `rgb(${lift(r)},${lift(g)},${lift(b)})`);
+    ctx.textAlign = "left"; ctx.font = sans(800, TS.l); ctx.fillStyle = K.ink; ctx.fillText(value, tx + 10 * U, ty + 42 * U, tw - 16 * U);
+    if (sub) { ctx.font = sans(500, TS.s); ctx.fillStyle = K.muted; ctx.fillText(sub, tx + 10 * U, ty + 57 * U, tw - 16 * U); }
   });
   ctx.restore(); ctx.textAlign = "left";
 }
@@ -8396,11 +8828,11 @@ async function readyVideo(W, H) {
   canvas.width = W; canvas.height = H;
   const plan = Object.assign(videoPlan(+$("videoLength").value), videoOptions());
   const L = videoLayout(W, H, plan.legs.length);
-  if (L.portrait) {  // the closing overview must fit the band between the title and the flight panel, not the full width
+  {  // the closing overview must fit the band between the title and the flight panel, not the full frame
     const band = L.panel.y - L.titleBottom;
     plan.overviewKm = Math.min(26000, Math.max(1500, plan.spreadKm * 2.6 * W / band));
   }
-  video.flights.forEach(f => logoImage(f.airline));  // start loading logos
+  video.flights.forEach(f => logoImage(f.airline, true));  // start loading logos
   $("videoStatus").textContent = "Loading map…";
   await Promise.all([preloadVideoTiles(plan, W, H), waitForLogos()]);
   if ($("videoModal").hidden) throw new Error("Cancelled");
@@ -8491,8 +8923,8 @@ async function exportVideo() {
     await encoder.flush();
     muxer.finalize();
     const name = videoFileName("mp4");
-    downloadBlob(new Blob([muxer.target.buffer], { type: "video/mp4" }), name);
-    $("videoStatus").textContent = `Saved ${name} (${W}×${H})`;
+    openShare(new Blob([muxer.target.buffer], { type: "video/mp4" }), name, { kind: "video", what: `${W} × ${H} · ${Math.round(plan.end)} s` });
+    $("videoStatus").textContent = `Ready: ${name} (${W}×${H})`;
   } catch (e) {
     $("videoStatus").textContent = `Couldn't render the video: ${e.message}`;
   } finally {
@@ -8510,8 +8942,8 @@ function startRecording(canvas, seconds) {
   video.recorder.ondataavailable = e => e.data.size && chunks.push(e.data);
   video.recorder.onstop = () => {
     const name = videoFileName(type.startsWith("video/mp4") ? "mp4" : "webm");
-    downloadBlob(new Blob(chunks, { type: type.split(";")[0] }), name);
-    $("videoStatus").textContent = `Saved ${name}`;
+    openShare(new Blob(chunks, { type: type.split(";")[0] }), name, { kind: "video" });
+    $("videoStatus").textContent = `Ready: ${name}`;
     $("videoRecord").disabled = false;
   };
   video.recorder.start();
@@ -8678,7 +9110,7 @@ function renderReel() {
       reel.stops.push(""); reel.legs.push({}); saveReel(); renderReel(); $(`rlStop${reel.stops.length - 1}`)?.focus();
     } }, icon("plus"), "Add connection"),
     el("div", { class: "rl-foot" },
-      el("button", { type: "button", class: "play-sm big", title: "Create video", "aria-label": "Create video", onclick: playReel }, icon("play")),
+      el("button", { type: "button", class: "play-sm big", title: "Create video", "aria-label": "Create video", "aria-haspopup": "menu", onclick: e => { e.stopPropagation(); openPlayMenu(e.currentTarget, "your reel", playReel); } }, icon("play")),
       el("span", { class: "rl-msg", id: "rlMsg", role: "alert" }),
       el("span", { class: "spacer", style: "flex:1" }),
       el("button", { type: "button", class: "linkbtn", text: "Start again", onclick: () => {
@@ -8699,7 +9131,7 @@ function reelPreview() {
       legs.length ? el("span", { class: "muted", text: [`${fmt(km)} km`, min ? `about ${span(min)}` : null, `${legs.length} flight${legs.length > 1 ? "s" : ""}`].filter(Boolean).join(" · ") }) : null),
     pic,
     el("div", { class: "rl-prev-foot" },
-      el("button", { type: "button", class: "play-sm big", title: "Create video", "aria-label": "Create video", onclick: playReel }, icon("play")),
+      el("button", { type: "button", class: "play-sm big", title: "Create video", "aria-label": "Create video", "aria-haspopup": "menu", onclick: e => { e.stopPropagation(); openPlayMenu(e.currentTarget, "your reel", playReel); } }, icon("play")),
       el("span", { class: "muted", text: legs.length === reel.stops.length - 1 && legs.length ? "Ready: play the video" : "Choose every airport to play" })));
 }
 // one airport: a search box (code, city or name) with suggestions; × removes a stop when more than two are left
@@ -8909,7 +9341,7 @@ function smoothly(fn) {
 }
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
   if (b.dataset.tab === state.tab) return;
-  const order = ["stats", "map", "hangar", "reel"];
+  const order = ["stats", "map", "hangar", "reel", "about"];
   document.documentElement.dataset.vtDir = order.indexOf(b.dataset.tab) > order.indexOf(state.tab) ? "fwd" : "back";
   smoothly(() => switchTab(b));
 }));
@@ -8918,11 +9350,12 @@ function switchTab(b) {
   if (b.dataset.tab === "stats" && state.tab !== "stats") statsMotion = true;
   state.tab = b.dataset.tab;
   document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
-  for (const tab of ["map", "stats", "hangar", "reel"]) $("tab-" + tab).hidden = state.tab !== tab;
-  document.querySelector(".controls").hidden = state.tab === "reel";  // filters don't apply there
+  for (const tab of ["map", "stats", "hangar", "reel", "about"]) $("tab-" + tab).hidden = state.tab !== tab;
+  document.querySelector(".controls").hidden = state.tab === "reel" || state.tab === "about";  // filters don't apply there
   document.querySelector(".real-opts").hidden = state.tab === "hangar";  // Actual tracks / times change nothing in the Hangar
   document.documentElement.dataset.tab = state.tab;
   if (state.tab === "reel" && !$("reel").firstChild) renderReel();
+  if (state.tab === "about") renderAbout();
   if (state.tab === "hangar") requestAnimationFrame(() => revealOnScroll(document.querySelectorAll(".hg-type")));
   showView(state.view);
   render({ fit: state.tab === "map" && !mapFitted });
@@ -9004,14 +9437,46 @@ $("dlKml").addEventListener("click", exportKML);
   const setH = () => document.documentElement.style.setProperty("--hdr-h", getComputedStyle(top).position === "sticky" ? `${top.offsetHeight}px` : "0px");
   if (top) { new ResizeObserver(setH).observe(top); addEventListener("resize", setH); setH(); }
 }
-// keyboard: ⌘K / Ctrl+K or / to search, 1–4 for the tabs, G for Map / Globe on the Travel log
+// keyboard: ⌘K / Ctrl+K or / to search, 1–5 for the tabs, G for Map / Globe on the Travel log
 document.addEventListener("keydown", e => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); $("quickSearch").focus(); $("quickSearch").select(); return; }
   if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest("input, select, textarea, [contenteditable]") || !$("videoModal").hidden) return;
   if (e.key === "/") { e.preventDefault(); $("quickSearch").focus(); return; }
-  const tab = { 1: "stats", 2: "map", 3: "hangar", 4: "reel" }[e.key];
+  const tab = { 1: "stats", 2: "map", 3: "hangar", 4: "reel", 5: "about" }[e.key];
   if (tab) { document.querySelector(`.tabs button[data-tab="${tab}"]`)?.click(); return; }
   if (e.key.toLowerCase() === "g" && state.tab === "map") document.querySelector(`.view-seg button[data-view="${state.view === "globe" ? "map" : "globe"}"]`)?.click();
+});
+/* ---------- About ---------- */
+// the message form posts to a form service, which emails the message on without showing the address anywhere.
+// Set CONTACT.url (and CONTACT.key for Web3Forms) to switch it on; until then the form says messages open soon.
+const CONTACT = { url: "", key: "" };  // e.g. { url: "https://api.web3forms.com/submit", key: "<access key>" } or { url: "https://formspree.io/f/<id>" }
+function renderAbout() {
+  const flown = ALL.filter(f => !f.future);
+  $("abFlights").textContent = fmt(flown.length);
+  $("abSince").textContent = flown.length ? Math.min(...flown.map(f => +f.date.slice(0, 4))) : "–";
+  if (!CONTACT.url) { $("abSend").disabled = true; $("abStatus").textContent = "Messages open soon."; }
+}
+document.querySelectorAll("[data-goto]").forEach(b => b.addEventListener("click", () => {
+  document.querySelector(`.tabs [data-tab="${b.dataset.goto}"]`)?.click();
+  scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}));
+$("aboutForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const form = e.target, msg = $("abMessage").value.trim(), email = $("abEmail").value.trim(), status = $("abStatus");
+  status.className = "ab-status";
+  if (!CONTACT.url) return;
+  if (form.botcheck.checked) return;  // a bot filled the hidden box
+  if (msg.length < 2) { status.className = "ab-status err"; status.textContent = "Write a message first."; $("abMessage").focus(); return; }
+  if (email && !$("abEmail").checkValidity()) { status.className = "ab-status err"; status.textContent = "That email doesn't look right (or leave it empty)."; $("abEmail").focus(); return; }
+  $("abSend").disabled = true; status.textContent = "Sending…";
+  try {
+    const body = { subject: "Boarding Past – a message", message: msg, ...(email ? { email } : {}), ...(CONTACT.key ? { access_key: CONTACT.key } : {}) };
+    const r = await fetch(CONTACT.url, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error(r.status);
+    form.reset(); status.className = "ab-status ok"; status.textContent = "Sent – thank you!";
+  } catch (err) {
+    status.className = "ab-status err"; status.textContent = "Couldn't send it – check your connection and try again.";
+  } finally { $("abSend").disabled = false; }
 });
 $("filtersToggle").addEventListener("click", () => {
   const open = $("filters").classList.toggle("open");
@@ -9027,7 +9492,11 @@ $("dlPoster").addEventListener("click", exportPoster);
 for (const id of ["dlKml", "dlCsv"]) $(id).addEventListener("click", () => { $("dlMenu").open = false; });
 document.addEventListener("click", e => { if (!e.target.closest("#dlMenu") && !$("dlPoster").disabled) $("dlMenu").open = false; });
 $("dlCsv").addEventListener("click", exportCSV);
-function themeChanged() { applyLineColors(); applyBase(); render({}); syncThemeButtons(); syncSwatches(); }
+function themeChanged() {
+  applyLineColors(); applyBase(); render({}); syncThemeButtons(); syncSwatches();
+  const dark = darkPage();  // airline logos: the dark-mode copies on a dark page
+  document.querySelectorAll("img.logo[data-light]").forEach(i => { i.src = dark ? i.dataset.dark : i.dataset.light; });
+}
 let syncSwatches = () => {};
 const SUN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>';
 const MOON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.7 6.7 0 0 0 10.8 10.8z"/></svg>';
