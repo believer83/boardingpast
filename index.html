@@ -1147,6 +1147,46 @@ header.top h1 { font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -0
 .ab-list li { display: grid; gap: 2px; padding-left: 18px; position: relative; line-height: 1.5; }
 .ab-list li::before { content: ""; position: absolute; left: 0; top: .5em; width: 8px; height: 8px; border-radius: 50%; background: var(--grad); }
 .ab-list span { color: var(--text-secondary); font-size: 14.5px; }
+/* how it's made: three columns joined by arrows (one under the other on narrow screens) */
+.ab-head2 h3 { margin: 0 0 var(--s4); font-size: 22px; letter-spacing: -.01em; }
+.ab-flowcard { padding: 24px 26px; }
+.ab-flow { display: grid; grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1.35fr) 44px minmax(0, 1fr); align-items: start; }
+.ab-col { display: grid; gap: 10px; min-width: 0; }
+.ab-col-h { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.ab-node { display: grid; gap: 6px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface-2); min-width: 0; }
+.ab-node b { font: 700 16px "Sora", system-ui, sans-serif; }
+.ab-node > span { font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+.ab-node.hub, .ab-node.main { border: 2px solid transparent; background: linear-gradient(var(--surface-2), var(--surface-2)) padding-box, var(--grad) border-box; }
+.ab-steps { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 0; padding: 0; list-style: none; counter-reset: st; }
+.ab-steps li { counter-increment: st; font-size: 12.5px; font-weight: 700; padding: 3px 10px 3px 6px; border-radius: 999px; background: var(--surface-1); color: var(--text-secondary); }
+.ab-steps li::before { content: counter(st); display: inline-grid; place-items: center; width: 17px; height: 17px; margin-right: 6px; border-radius: 50%;
+  background: var(--grad); color: var(--on-grad); font-size: 10.5px; }
+.ab-sub { margin: 4px 0 0; font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.ab-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ab-chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border);
+  font-size: 13px; font-weight: 600; color: var(--text-primary); text-decoration: none; background: var(--surface-1); justify-self: start; }
+.ab-chip em { font-style: normal; font-weight: 500; font-size: 12px; color: var(--text-muted); }
+a.ab-chip:hover { border-color: var(--accent); }
+.ab-arrow { align-self: center; position: relative; height: 2px; margin: 0 8px; background: var(--grad); border-radius: 2px; }
+.ab-arrow::after { content: ""; position: absolute; right: -2px; top: -5px; border: 6px solid transparent; border-left: 8px solid var(--accent); border-right: 0; }
+.ab-arrow.up { justify-self: center; width: 2px; height: 22px; margin: 0; }
+.ab-arrow.up::after { right: auto; left: -5px; top: -7px; border: 6px solid transparent; border-bottom: 8px solid var(--accent); border-top: 0; }
+.ab-foot { margin: 2px 0 0; font-size: 13px; line-height: 1.5; color: var(--text-muted); }
+/* what the sources add: one bar per detail, its share of the flights flown */
+.ab-bars-chart { display: grid; gap: 14px; margin-top: 6px; }
+.ab-bar { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: baseline; }
+.ab-bar b { font-size: 14.5px; }
+.ab-bar small { grid-column: 1; font-size: 12.5px; color: var(--text-muted); }
+.ab-bar .v { grid-row: 1; grid-column: 2; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ab-bar .v em { font-style: normal; font-weight: 500; color: var(--text-muted); }
+.ab-bar .track { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.ab-bar .track i { display: block; height: 100%; border-radius: 4px; background: var(--grad); }
+@media (max-width: 900px) {
+  .ab-flow { grid-template-columns: 1fr; }
+  .ab-flow > .ab-arrow:not(.up) { justify-self: center; width: 2px; height: 26px; margin: 8px 0; }
+  .ab-flow > .ab-arrow:not(.up)::after { right: auto; left: -5px; top: auto; bottom: -2px; border: 6px solid transparent; border-top: 8px solid var(--accent); border-bottom: 0; }
+}
+@media (max-width: 520px) { .ab-flowcard { padding: 20px; } }
 /* the message form */
 .ab-msg { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--s5); padding: 26px; }
 .ab-msg-intro p:not(.ab-kicker) { margin: 10px 0 0; line-height: 1.6; color: var(--text-secondary); max-width: 40ch; }
@@ -2740,25 +2780,48 @@ td.empty-cell { cursor: default; }
         <article class="card ab-text">
           <p class="ab-kicker">Why I made it</p>
           <h3>One place for every flight and every trip</h3>
-          <p>A fan of airlines for as long as I can remember, I've logged my flights on FlightMemory for more than 20 years. It still holds my history, but it has become an outdated tool, and the few others out there – OpenFlights, Flightdiary, myFlightradar24 – mostly add complexity: unreliable imports, dull interfaces, and something new to work around at every update.</p>
+          <p>A fan of airlines for as long as I can remember, I've logged my flights on FlightMemory for more than 20 years. It still holds my history, but it has become an outdated tool, and the few others out there – OpenFlights, Flightdiary (now myFlightradar24), LogMy.World – mostly add complexity: unreliable imports, dull interfaces, and something new to work around at every update.</p>
           <p>Then there's the travel bug. Google Maps, TripAdvisor's visited cities, an app for visited countries… every trip became a challenge to update them all.</p>
           <p>And sharing a trip on Instagram? Apps like TravelBoast or mult.dev look childish, make you sit through ads, and charge a small fortune for a 20-second story that disappears after 24 hours.</p>
           <p>As an IT professional, I ended up starting my own coding project to automate all of it, and to build a single platform that handles everything my way: my own ideas, my own data, my own design. Boarding Past is the result.</p>
         </article>
-        <article class="card ab-text">
-          <p class="ab-kicker">How it's made</p>
-          <h3>Logged by hand, checked against the sky</h3>
-          <ul class="ab-list">
-            <li><b>Logged once, on FlightMemory</b><span>every flight entered in one place, the logbook kept for over 20 years.</span></li>
-            <li><b>Synced everywhere else</b><span>the same flights sent on to OpenFlights and myFlightradar24 automatically – no more typing each one three times.</span></li>
-            <li><b>Enriched with real data</b><span>actual departure and landing times, and the path each flight really flew, from public flight-tracking data.</span></li>
-            <li><b>The aircraft themselves</b><span>registrations, types and ages, with photos of the very aircraft from Planespotters.net.</span></li>
-            <li><b>Ready to share</b><span>reels, stories and images of any flight or trip for Instagram, TikTok and Facebook, with every detail: route, airline, aircraft, seat, times and distance.</span></li>
-            <li><b>Open maps</b><span>OpenStreetMap data and open map styles, drawn in the theme's colours.</span></li>
-            <li><b>Nothing about you</b><span>no ads, no analytics, no cookies. Your theme and settings stay on your device.</span></li>
-          </ul>
+        <article class="card ab-text ab-cover">
+          <p class="ab-kicker">What the sources add</p>
+          <h3>How complete the logbook is</h3>
+          <p>Share of the <b id="abFlown">–</b> flights flown that each detail covers, and where it comes from.</p>
+          <div class="ab-bars-chart" id="abCover" role="list"></div>
         </article>
       </div>
+
+      <section class="card ab-flowcard" aria-labelledby="abFlowH">
+        <div class="ab-head2"><p class="ab-kicker">How it's made</p><h3 id="abFlowH">Logged once, enriched, synced everywhere</h3></div>
+        <div class="ab-flow">
+          <div class="ab-col">
+            <p class="ab-col-h">1 · Logged by hand</p>
+            <div class="ab-node main"><b>FlightMemory</b><span>The master copy: every flight since the first one, kept for over 20 years.</span><a class="ab-chip" href="https://www.flightmemory.com" target="_blank" rel="noopener">flightmemory.com</a></div>
+            <div class="ab-node"><b>Places</b><span>Visited cities and countries reached without flying.</span><a class="ab-chip" href="https://www.tripadvisor.com" target="_blank" rel="noopener">TripAdvisor Travel Map</a></div>
+          </div>
+          <div class="ab-arrow" aria-hidden="true"></div>
+          <div class="ab-col">
+            <p class="ab-col-h">2 · Boarding Past</p>
+            <div class="ab-node hub"><b>Export · check · enrich · merge</b><span>One command pulls the log, checks it (typos, impossible dates, duplicates) and adds what the sky recorded.</span>
+              <ol class="ab-steps"><li>Export</li><li>Check</li><li>Enrich</li><li>Merge</li><li>Build</li></ol></div>
+            <div class="ab-arrow up" aria-hidden="true"></div>
+            <div class="ab-node">
+              <p class="ab-sub">Flight tracking</p><div class="ab-chips"><a class="ab-chip" href="https://opensky-network.org" target="_blank" rel="noopener">OpenSky Network <em>times · tracks · aircraft</em></a><a class="ab-chip" href="https://www.flightaware.com" target="_blank" rel="noopener">FlightAware <em>registrations · gate times · tracks</em></a></div>
+              <p class="ab-sub">Aircraft</p><div class="ab-chips"><a class="ab-chip" href="https://www.planespotters.net" target="_blank" rel="noopener">Planespotters.net <em>photos</em></a><a class="ab-chip" href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb <em>fleet today</em></a><a class="ab-chip" href="https://www.casa.gov.au/aircraft/civil-aircraft-register" target="_blank" rel="noopener">CASA register <em>build years</em></a></div>
+              <p class="ab-sub">Airports, airlines, maps</p><div class="ab-chips"><a class="ab-chip" href="https://openflights.org/data" target="_blank" rel="noopener">OpenFlights data</a><a class="ab-chip" href="https://ourairports.com" target="_blank" rel="noopener">OurAirports</a><a class="ab-chip" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a><a class="ab-chip" href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a><a class="ab-chip" href="https://www.naturalearthdata.com" target="_blank" rel="noopener">Natural Earth</a><a class="ab-chip" href="https://earthobservatory.nasa.gov/features/NightLights" target="_blank" rel="noopener">NASA night lights</a><a class="ab-chip" href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">AWS terrain</a><a class="ab-chip" href="https://maplibre.org" target="_blank" rel="noopener">MapLibre</a></div>
+            </div>
+          </div>
+          <div class="ab-arrow" aria-hidden="true"></div>
+          <div class="ab-col">
+            <p class="ab-col-h">3 · Out</p>
+            <div class="ab-node"><b>Synced</b><span>The same flights, never typed twice.</span><div class="ab-chips"><a class="ab-chip" href="https://openflights.org" target="_blank" rel="noopener">OpenFlights <em>automatic</em></a><a class="ab-chip" href="https://my.flightradar24.com" target="_blank" rel="noopener">myFlightradar24 <em>import file</em></a><a class="ab-chip" href="https://logmy.world" target="_blank" rel="noopener">LogMy.World <em>import file</em></a></div></div>
+            <div class="ab-node main"><b>This page</b><span>Statistics, map and globe, the hangar, and images and reels ready for Instagram, TikTok and Facebook.</span></div>
+            <p class="ab-foot">No ads, no analytics, no cookies: your theme and settings stay on your device.</p>
+          </div>
+        </div>
+      </section>
 
       <form class="card ab-msg" id="aboutForm" novalidate>
         <div class="ab-msg-intro">
@@ -3298,36 +3361,6 @@ async function downloadPassport(btn) {
     btn.disabled = false; btn.replaceChildren(...label);
   }
 }
-// "My travels": a 1080 × 1080 card with the headline figures in the theme's colours, in the Share panel
-function shareStatsCard(vis, { km, min, apCodes }) {
-  const S = 1080, c = el("canvas", { width: S, height: S }), g = c.getContext("2d"), P = pal(), [c0, c1, c2] = P.holo;
-  g.fillStyle = "#0b0a1f"; g.fillRect(0, 0, S, S);
-  for (const [x, y, r, col] of [[0, 0, 760, c0], [S, S, 820, c1], [S, 0, 520, c2]]) {
-    const rg = g.createRadialGradient(x, y, 0, x, y, r);
-    rg.addColorStop(0, col + "55"); rg.addColorStop(1, col + "00"); g.fillStyle = rg; g.fillRect(0, 0, S, S);
-  }
-  const grad = g.createLinearGradient(80, 0, S - 80, 0);
-  grad.addColorStop(0, c0); grad.addColorStop(0.5, c1); grad.addColorStop(1, c2);
-  const font = (w, px) => `${w} ${px}px Sora, "Twemoji Country Flags", system-ui, sans-serif`;
-  g.textBaseline = "alphabetic";
-  g.font = font(800, 64); g.fillStyle = grad; g.fillText("boarding past", 80, 150);
-  const years = vis.map(f => f.year);
-  g.font = font(600, 30); g.fillStyle = "rgba(255,255,255,.72)";
-  g.fillText(`MY TRAVELS · ${Math.min(...years)}–${Math.max(...years)}`.split("").join("\u200a"), 82, 205);
-  const countries = new Set(vis.flatMap(f => [AP[f.from].country, AP[f.to].country])).size + extraCountries(vis).length;
-  const figs = [["flights", fmt(vis.length)], ["km flown", fmt(km)], ["countries", fmt(countries)],
-                ["cities", fmt((DATA.cities || []).length)], ["airports", fmt(apCodes.size)], ["days in the air", fmt1(min / 60 / 24)]];
-  figs.forEach(([label, value], i) => {
-    const x = 80 + (i % 2) * 470, y = 360 + Math.floor(i / 2) * 210;
-    g.font = font(800, value.length > 7 ? 84 : 104); g.fillStyle = "#ffffff"; g.fillText(value, x, y);
-    g.font = font(500, 32); g.fillStyle = "rgba(255,255,255,.66)"; g.fillText(label, x + 4, y + 50);
-  });
-  g.fillStyle = grad; g.fillRect(80, S - 120, S - 160, 4);
-  g.font = font(600, 26); g.fillStyle = "rgba(255,255,255,.6)"; g.fillText("BEEN THERE, FLOWN THAT", 80, S - 66);
-  c.toBlob(blob => {
-    openShare(blob, `boarding-past-my-travels-${localIso(new Date())}.png`, { what: "My travels · 1080 × 1080" });
-  }, "image/png");
-}
 /* ---------- Share: one panel for every image and video ----------
    A web page can't post into Instagram, TikTok, Facebook or X by itself: those take a file from their own app or from
    the system's share list. On a phone that can share files, every button opens that list, which holds the apps
@@ -3407,17 +3440,37 @@ let currentCountryVisits = new Map(), currentExtra = new Set();
 // every theme change
 const THEME_COLOURS = ["Theme colour 1", "Theme colour 2", "Theme colour 3"];
 const colourOf = v => typeof v === "string" && v.startsWith("theme:") ? pal().holo[+v.slice(6)] || pal().holo[0] : v;
-function countryFill(n) {
+function countryFill(n) {  // [colour, opacity as drawn]
   if (!n) return [null, 0];
-  if (!style.rampCountries) return [colourOf(style.country) || rampColor(4), 0.42];
-  // the theme's shades, kept clearly apart from the land (3:1), and stronger with more visits (drawn at 0.45 × this)
-  // (from the ramp's middle shade up: the palest shades lose their colour when made legible and look grey)
-  if (!style.country) {
-    const i = n >= 25 ? 4 : n >= 10 ? 3 : n >= 4 ? 2 : n >= 2 ? 1 : 0, steps = pal().ramp[css("--tiles") === "dark" ? "dark" : "light"];
-    return [legible(steps[Math.max(i, 2)], mapLand()), [0.35, 0.45, 0.55, 0.65, 0.75][i]];
-  }
-  return [colourOf(style.country), n >= 25 ? 0.62 : n >= 10 ? 0.5 : n >= 4 ? 0.4 : n >= 2 ? 0.32 : 0.24];
+  const land = mapLand(), i = n >= 25 ? 4 : n >= 10 ? 3 : n >= 4 ? 2 : n >= 2 ? 1 : 0, level = style.rampCountries ? i : 2;
+  // a light tint, so the land, relief and names stay visible under it; stronger with more visits
+  const share = [0.14, 0.18, 0.23, 0.28, 0.34][level];
+  // its colour: the one picked in Map style, else the theme colour that stands out most from the land (a hue apart
+  // from it, not just lighter: violet on indigo land hardly shows), kept 3:1 from the land so the outline reads
+  return [legible(style.country ? colourOf(style.country) : countryHue(land), land), share];
 }
+const countryHues = new Map();
+function countryHue(land) {
+  const P = pal(), mode = css("--tiles") === "dark" ? "dark" : "light", city = cityColour();
+  const key = (document.documentElement.dataset.palette || "") + mode + land + city;
+  if (!countryHues.has(key)) {
+    // a colour, not white or grey, and apart from the visited cities' dots drawn on top
+    const chroma = c => Math.hypot(okLab(c)[1], okLab(c)[2]);
+    const all = [...P.holo, ...P.ramp[mode].slice(2)].filter(isHex).map(c => legible(c, land));
+    const options = all.filter(c => chroma(c) > 0.06 && okDistance(c, city) > 0.2);
+    countryHues.set(key, !land ? (options[0] || all[0]) : (options.length ? options : all)
+      .map(c => [c, okDistance(mix(land, c, 0.18), land)]).sort((x, y) => y[1] - x[1])[0][0]);
+  }
+  return countryHues.get(key);
+}
+// distance between two colours as the eye sees it (OKLab)
+function okLab(hex) {
+  const [r, g, b] = rgb(hex).map(v => (v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b), m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b),
+        s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  return [0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s];
+}
+const okDistance = (a, b) => Math.hypot(...okLab(a).map((v, i) => v - okLab(b)[i]));
 
 // The map and the video's photo maps draw with WebGL, which a browser can switch off or refuse
 // (hardware acceleration off, GPU reset, too many 3D pages open). Checked each time, as it can come back.
@@ -4620,7 +4673,6 @@ const OFM = name => `https://tiles.openfreemap.org/styles/${name}`;  // OpenFree
 // elevation (AWS Terrain Tiles, free): shaded relief, and 3D terrain when the map is tilted
 const DEM = { type: "raster-dem", tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"], encoding: "terrarium",
               tileSize: 256, maxzoom: 14, attribution: "Elevation: Mapzen Terrain Tiles (AWS)" };
-const NIGHT_IMG = "https://cdn.jsdelivr.net/npm/three-globe@2.45.2/example/img/earth-night.jpg";  // NASA city lights, one image
 // latitude and longitude lines every 15°, faint, like a navigation chart
 const GRATICULE = (() => {
   const f = [], line = c => f.push({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: c } });
@@ -4761,6 +4813,8 @@ function legible(c, land, min = 3) {
 }
 // the land colour of the theme's own maps (Theme, Light, Dark map types), which the routes, airports and countries are
 // kept legible against; null on the other map types (photos and printed maps have no single land colour)
+// a mark's colour kept legible on the map (routes, planned routes, airports, cities): the theme's or the colour picked
+const onLand = c => legible(c, mapLand());
 function mapLand() {
   const b = BASEMAPS[baseKey()];
   return b && b.themed ? themeColours(b.themed).land : null;
@@ -4830,12 +4884,15 @@ function addMapLayers(m) {
   };
   const firstLabel = m.getStyle().layers.find(l => l.type === "symbol")?.id;  // countries and night go under the names
   // night and city lights first, so the visited countries stay on top of them
-  add("cr-night", "cr-night", { type: "fill", paint: { "fill-color": "#02030a", "fill-opacity": ["get", "o"], "fill-antialias": false } }, firstLabel);
-  if (!m.getSource("cr-lights")) m.addSource("cr-lights", { type: "image", url: TRANSPARENT_PX, coordinates: MERC_CORNERS });
-  m.addLayer({ id: "cr-lights", type: "raster", source: "cr-lights", paint: { "raster-opacity": 0.95, "raster-fade-duration": 0 } }, firstLabel);
+  pageNight = pageNight || nightCanvas();
+  if (!m.getSource("cr-night")) m.addSource("cr-night", { type: "canvas", canvas: pageNight, coordinates: MERC_CORNERS, animate: false });
+  m.addLayer({ id: "cr-night", type: "raster", source: "cr-night", layout: { visibility: "none" }, paint: { "raster-opacity": 1, "raster-fade-duration": 0 } }, firstLabel);
+  pageLights = pageLights || el("canvas", { width: 256, height: 256 });
+  if (!m.getSource("cr-lights")) m.addSource("cr-lights", { type: "canvas", canvas: pageLights, coordinates: MERC_CORNERS, animate: false });
+  m.addLayer({ id: "cr-lights", type: "raster", source: "cr-lights", paint: { "raster-opacity": LIGHTS_OPACITY, "raster-fade-duration": 0 } }, firstLabel);
   // visited countries: a light fill with a glowing outline in their colour
   const on = ["boolean", ["feature-state", "on"], false], fc = ["coalesce", ["feature-state", "c"], "#000000"];
-  add("cr-country", "cr-countries", { type: "fill", paint: { "fill-color": fc, "fill-opacity": ["*", 0.45, ["coalesce", ["feature-state", "op"], 0]] } }, firstLabel);
+  add("cr-country", "cr-countries", { type: "fill", paint: { "fill-color": fc, "fill-opacity": ["coalesce", ["feature-state", "op"], 0] } }, firstLabel);
   add("cr-country-glow", "cr-countries", { type: "line", paint: { "line-color": fc, "line-width": 5, "line-blur": 4, "line-opacity": ["case", on, 0.35, 0] } }, firstLabel);
   add("cr-country-line", "cr-countries", { type: "line", paint: { "line-color": fc, "line-width": 0.9, "line-opacity": ["case", on, 0.9, 0] } }, firstLabel);
   const round = { "line-cap": "round", "line-join": "round" };
@@ -4931,34 +4988,71 @@ function routeFlow(ph) {
 }
 const MERC_CORNERS = [[-180, 85.0511], [180, 85.0511], [180, -85.0511], [-180, -85.0511]];
 const TRANSPARENT_PX = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
-// city lights on the night side at a moment: NASA's night image, redrawn in the map's (Mercator) projection once,
-// then cut to the night side with a soft twilight edge; resolves to a blob URL for an image source
-let lightsBase = null;
-function lightsBaseCanvas() {
-  return lightsBase || (lightsBase = new Promise((res, rej) => {
+// city lights on the night side: NASA's Black Marble tiles (the Night lights map's own, sharp down to zoom 8) for the
+// area in view, cut to the night side with a soft dusk. One picture of the whole world turned blocky once zoomed in
+const lightTiles = new Map();
+function lightTile(z, x, y) {
+  const k = `${z}/${x}/${y}`;
+  if (!lightTiles.has(k)) lightTiles.set(k, new Promise(res => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const S = 2048, c = el("canvas", { width: S, height: S }), g = c.getContext("2d"), H = img.naturalHeight, step = 4;
-      for (let y = 0; y < S; y += step) {  // each strip of Mercator rows from the matching rows of the plain lat/lon image
-        const lat = Math.atan(Math.sinh(Math.PI * (1 - 2 * (y + step / 2) / S))) * 180 / Math.PI;
-        g.drawImage(img, 0, (90 - lat) / 180 * H - 1, img.naturalWidth, 2, 0, y, S, step);
-      }
-      res(c);
-    };
-    img.onerror = () => { lightsBase = null; rej(new Error("night image")); };
-    img.src = NIGHT_IMG;
+    img.onload = () => res(img); img.onerror = () => { lightTiles.delete(k); res(null); };
+    img.src = NIGHT_TILES.replace("{z}", z).replace("{x}", x).replace("{y}", y);
   }));
+  return lightTiles.get(k);
 }
-async function lightsImage(ms) {
-  const base = await lightsBaseCanvas(), S = base.width, c = el("canvas", { width: S, height: S }), g = c.getContext("2d");
-  g.drawImage(base, 0, 0);
-  const merc = lat => S * (1 - Math.log(Math.tan(Math.PI / 4 + Math.max(-85.05, Math.min(85.05, lat)) * Math.PI / 360)) / Math.PI) / 2;
-  const ring = nightArea(ms, -4).geometry.coordinates[0];  // lights come on through dusk
-  g.globalCompositeOperation = "destination-in"; g.filter = `blur(${S / 45}px)`;
-  g.beginPath(); ring.forEach(([lon, lat], i) => { const x = (lon + 180) / 360 * S, y = merc(lat); i ? g.lineTo(x, y) : g.moveTo(x, y); });
-  g.closePath(); g.fillStyle = "#fff"; g.fill();
-  return new Promise(res => c.toBlob(b => res(URL.createObjectURL(b)), "image/png"));
+const tileX = (lon, z) => (lon + 180) / 360 * 2 ** z;
+const tileY = (lat, z) => (1 - Math.log(Math.tan(Math.PI / 4 + Math.max(-85.05, Math.min(85.05, lat)) * Math.PI / 360)) / Math.PI) / 2 * 2 ** z;
+const tileLon = (x, z) => x / 2 ** z * 360 - 180;
+const tileLat = (y, z) => Math.atan(Math.sinh(Math.PI * (1 - 2 * y / 2 ** z))) * 180 / Math.PI;
+// the tiles covering the map's view, as sharp as the view needs (at most 8 × 8 tiles, 2048 pixels), plus up to `margin`
+// of the view around it where that still fits, so small camera moves need no repaint; zoomed out, the whole world at zoom 3
+function lightsArea(m, margin = 0) {
+  const WORLD = { z: 3, x0: 0, x1: 7, y0: 0, y1: 7 };
+  const b = m.getBounds(), c = m.getCenter();
+  let w = b.getWest(), e = b.getEast();
+  if (e - w >= 160) return WORLD;
+  while (c.lng - 360 > w && e > 180) { w -= 360; e -= 360; }  // the view's centre between −180° and 180°
+  while (c.lng + 360 < e && w < -180) { w += 360; e += 360; }
+  w = Math.max(-180, w); e = Math.min(180, e);  // across the date line only the centre's side gets lights
+  const south = Math.max(-85, b.getSouth()), north = Math.min(85, b.getNorth());
+  for (let z = Math.max(3, Math.min(8, Math.round(m.getZoom()) + 1)); z > 3; z--) {
+    const n = 2 ** z, x0 = Math.max(0, Math.floor(tileX(w, z))), x1 = Math.min(n - 1, Math.floor(tileX(e, z))),
+          y0 = Math.max(0, Math.floor(tileY(north, z))), y1 = Math.min(n - 1, Math.floor(tileY(south, z)));
+    if (x1 - x0 >= 8 || y1 - y0 >= 8) continue;
+    const grow = (lo, hi) => { const k = Math.min(Math.ceil((hi - lo + 1) * margin), Math.floor((7 - (hi - lo)) / 2)); return [Math.max(0, lo - k), Math.min(n - 1, hi + k)]; };
+    const [gx0, gx1] = grow(x0, x1), [gy0, gy1] = grow(y0, y1);
+    return { z, x0: gx0, x1: gx1, y0: gy0, y1: gy1 };
+  }
+  return WORLD;
+}
+const areaCovers = (A, B) => A && B && A.z === B.z && A.x0 <= B.x0 && A.x1 >= B.x1 && A.y0 <= B.y0 && A.y1 >= B.y1;
+// lights come on through dusk: none while the sun is up, all once it is 8° below the horizon
+const lightsShare = sinAlt => { const h = Math.asin(Math.max(-1, Math.min(1, sinAlt))) * 180 / Math.PI, t = Math.min(1, Math.max(0, -h / 8)); return t * t * (3 - 2 * t); };
+// draws the area's tiles into the canvas, keeps the night side; resolves to the corners for the canvas source
+async function paintAreaLights(canvas, A, ms) {
+  const T = 256, nx = A.x1 - A.x0 + 1, ny = A.y1 - A.y0 + 1, jobs = [];
+  for (let y = A.y0; y <= A.y1; y++) for (let x = A.x0; x <= A.x1; x++) jobs.push(lightTile(A.z, x, y).then(img => [x, y, img]));
+  const tiles = await Promise.all(jobs);
+  canvas.width = nx * T; canvas.height = ny * T;
+  const g = canvas.getContext("2d");
+  for (const [x, y, img] of tiles) if (img) g.drawImage(img, (x - A.x0) * T, (y - A.y0) * T, T, T);
+  // the night side, worked out on a coarse grid and smoothed up (the dusk is hundreds of kilometres wide)
+  const k = 16, mw = nx * k, mh = ny * k, mask = el("canvas", { width: mw, height: mh }), mg = mask.getContext("2d"), img = mg.createImageData(mw, mh), d = img.data;
+  const r = Math.PI / 180, [slon, slat] = subsolarPoint(ms), sd = Math.sin(slat * r), cd = Math.cos(slat * r);
+  for (let j = 0, i = 0; j < mh; j++) {
+    const lat = tileLat(A.y0 + (j + 0.5) / k, A.z) * r, a = Math.sin(lat) * sd, bb = Math.cos(lat) * cd;
+    for (let q = 0; q < mw; q++, i += 4) {
+      const lon = tileLon(A.x0 + (q + 0.5) / k, A.z);
+      d[i] = d[i + 1] = d[i + 2] = 255; d[i + 3] = Math.round(255 * lightsShare(a + bb * Math.cos((lon - slon) * r)));
+    }
+  }
+  mg.putImageData(img, 0, 0);
+  g.globalCompositeOperation = "destination-in"; g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high";
+  g.drawImage(mask, 0, 0, canvas.width, canvas.height);
+  g.globalCompositeOperation = "source-over";
+  const w = tileLon(A.x0, A.z), e = tileLon(A.x1 + 1, A.z), n = tileLat(A.y0, A.z), so = tileLat(A.y1 + 1, A.z);
+  return [[w, n], [e, n], [e, so], [w, so]];
 }
 // a shape crossing the date line (Fiji, eastern Russia) as one continuous outline: west longitudes moved past 180°,
 // so the map doesn't join its two halves straight across the whole world
@@ -5015,6 +5109,7 @@ function setFocus(f) {
 }
 let spinPause = 0;
 function wireMapEvents() {
+  map.on("moveend", () => syncPageLights());
   mapTip = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: "cr-tip", offset: 14, maxWidth: "320px" });
   const hoverable = ["cr-city", "cr-airport", "cr-route-hit", "cr-country"];
   map.on("mousemove", e => {
@@ -5066,10 +5161,44 @@ function nightArea(ms, h = 0) {
   }
   return { type: "Feature", properties: { h }, geometry: { type: "Polygon", coordinates: [[...ring, [180, pole], [-180, pole], ring[0]]] } };
 }
-// the night as stacked bands, darker as the sun sinks (+4°, 0°, −6°, −12°, −18°): a soft twilight instead of one hard edge
-const NIGHT_BANDS = [[4, 0.07], [0, 0.1], [-6, 0.1], [-12, 0.1], [-18, 0.1]];
-const nightBands = (ms, scale = 1) => ({ type: "FeatureCollection",
-  features: NIGHT_BANDS.map(([h, o]) => { const f = nightArea(ms, h); f.properties.o = o * scale; return f; }) });
+// the night as one smooth shade: each place as dark as the sun is low there – nothing while the sun is 6° up, full night
+// once it is 18° below the horizon, eased in between (stacked bands showed as 4-5 steps)
+const nightShare = sinAlt => { const h = Math.asin(Math.max(-1, Math.min(1, sinAlt))) * 180 / Math.PI, t = Math.min(1, Math.max(0, (6 - h) / 24)); return t * t * (3 - 2 * t); };
+// painted into a Mercator canvas (a MapLibre canvas source: no image to encode and decode)
+function paintNight(canvas, ms, colour, maxA) {
+  const W = canvas.width, H = canvas.height, g = canvas.getContext("2d"), img = g.createImageData(W, H), d = img.data;
+  const r = Math.PI / 180, [slon, slat] = subsolarPoint(ms), sd = Math.sin(slat * r), cd = Math.cos(slat * r), [R, G, B] = rgb(colour);
+  const cosL = new Float32Array(W);
+  for (let x = 0; x < W; x++) cosL[x] = Math.cos(((x + 0.5) / W * 360 - 180 - slon) * r);
+  for (let y = 0, i = 0; y < H; y++) {
+    const lat = Math.atan(Math.sinh(Math.PI * (1 - 2 * (y + 0.5) / H))), a = Math.sin(lat) * sd, b = Math.cos(lat) * cd;
+    for (let x = 0; x < W; x++, i += 4) { d[i] = R; d[i + 1] = G; d[i + 2] = B; d[i + 3] = Math.round(255 * maxA * nightShare(a + b * cosL[x])); }
+  }
+  g.putImageData(img, 0, 0);
+}
+// a canvas source shows its canvas's new content on the next drawing only while "playing"
+// (after moving it, the map needs a few drawings to place it again, so it keeps "playing" a moment)
+function refreshCanvasSource(m, id) {
+  const src = m.getSource(id);
+  if (!src || !src.play) return;
+  src.play(); m.redraw();
+  let left = 2;  // each drawing while playing uploads the whole canvas again: only as many as it takes
+  const stop = () => { if (--left <= 0) { src.pause(); m.off("render", stop); } };
+  m.on("render", stop); m.triggerRepaint();
+}
+const nightCanvas = () => el("canvas", { width: 512, height: 512 });
+const LIGHTS_OPACITY = 0.95;
+// the video's map is drawn for every frame anyway: a changed canvas is taken in by that drawing, not an extra one
+function showOnNextDraw(m, id) {
+  const src = m.getSource(id);
+  if (!src || !src.play) return;
+  src.play();
+  (video.freshSources = video.freshSources || new Map()).set(src, 2);  // taken in over the next two drawings
+}
+function afterVideoDraw() {
+  if (!video.freshSources) return;
+  video.freshSources.forEach((n, src) => { if (n <= 1) { src.pause(); video.freshSources.delete(src); } else video.freshSources.set(src, n - 1); });
+}
 // one animation loop while the map is on screen (~30 frames a second): colours along the routes, tiny planes on them,
 // radar rings on the busiest airports, the Globe view turning slowly (paused a while after you move it), the selected
 // flight's plane and glow. Nothing moves with "reduce motion"
@@ -5484,25 +5613,31 @@ function flightPopup(f) {
       imageButton([f], !f.future, "pop-play")));
 }
 // day & night (Map style option): today's night side shaded, with the city lights glowing there; redrawn every 10 minutes
-let lightsAt = 0, lightsUrl = null;
+let pageNight = null, pageLights = null, pageLightsArea = null, pageLightsBusy = false;
 function syncDayNight() {
   const on = style.dayNight && baseKey() !== "night";
-  map.getSource("cr-night").setData(on ? nightBands(Date.now()) : { type: "FeatureCollection", features: [] });
+  map.setLayoutProperty("cr-night", "visibility", on ? "visible" : "none");
+  if (on) { paintNight(pageNight, Date.now(), "#02030a", 0.42); refreshCanvasSource(map, "cr-night"); }
   map.setLayoutProperty("cr-lights", "visibility", on ? "visible" : "none");
-  if (on && Date.now() - lightsAt > 6e5) {
-    lightsAt = Date.now();
-    lightsImage(lightsAt).then(url => {
-      if (lightsUrl) URL.revokeObjectURL(lightsUrl);
-      lightsUrl = url;
-      map.getSource("cr-lights")?.updateImage({ url, coordinates: MERC_CORNERS });
-    }).catch(() => { lightsAt = 0; });
-  } else if (on && lightsUrl && map.getSource("cr-lights")) map.getSource("cr-lights").updateImage({ url: lightsUrl, coordinates: MERC_CORNERS });
+  pageLightsArea = null;  // repaint for the time now
+  syncPageLights();
+}
+// the lights for the area in view, repainted when the map moves outside what is painted (or zooms in or out)
+async function syncPageLights() {
+  if (!map || !style.dayNight || baseKey() === "night" || !map.getSource("cr-lights") || pageLightsBusy) return;
+  if (areaCovers(pageLightsArea, lightsArea(map))) return;
+  pageLightsBusy = true;
+  try {
+    const A = lightsArea(map, 0.35), corners = await paintAreaLights(pageLights, A, Date.now());
+    if (map.getSource("cr-lights")) { map.getSource("cr-lights").setCoordinates(corners); refreshCanvasSource(map, "cr-lights"); pageLightsArea = A; }
+  } finally { pageLightsBusy = false; }
+  if (!areaCovers(pageLightsArea, lightsArea(map))) syncPageLights();  // it moved on meanwhile
 }
 setInterval(() => { if (map && style.dayNight && map.getSource("cr-night")) syncDayNight(); }, 6e5);
 // keep what to draw, then draw it as soon as the map (and its style) is ready
 // the routes of these flights as map lines, in the Map style's colours and thickness
 function routeLines(vis) {
-  const past = css("--route"), future = css("--planned");
+  const past = onLand(css("--route")), future = onLand(css("--planned"));
   const routes = new Map();
   for (const f of vis) {
     const k = [f.from, f.to].sort().join("-");
@@ -5530,18 +5665,18 @@ function routeLines(vis) {
   return lines;
 }
 function airportData(visits) {
-  const P = pal(), ramp = freqRamp(), past = css("--route"), surface = css("--surface-1");
+  const P = pal(), ramp = freqRamp(), past = onLand(css("--route")), surface = css("--surface-1");
   return { type: "FeatureCollection", features: [...visits].reverse().map(([code, n], i) => ({ type: "Feature",
     properties: { code, n, r: style.sizeDots ? 2 + Math.sqrt(n) * 0.8 : 3, g: 2 + Math.sqrt(n) * 0.9,
-                  c: style.rampDots ? ramp[binOf(n, AIRPORT_BINS)] : style.gradient ? P.holo[0] : past, s: surface,
+                  c: style.rampDots ? ramp[binOf(n, AIRPORT_BINS)] : style.gradient ? onLand(P.holo[0]) : past, s: surface,
                   top: i >= visits.length - 8 ? 1 : 0 },
     geometry: { type: "Point", coordinates: [AP[code].lon, AP[code].lat] } })) };
 }
 // the visited cities' colour: the one picked, else one that stands apart from the airport dots and the routes
 function cityColour() {
-  if (style.city) return colourOf(style.city);
+  if (style.city) return onLand(colourOf(style.city));
   const P = pal(), mode = BASEMAPS[baseKey()].dark ? "dark" : "light";
-  return (P.city && P.city[mode]) || (mode === "dark" ? "#ffd23f" : "#b4410a");
+  return onLand((P.city && P.city[mode]) || (mode === "dark" ? "#ffd23f" : "#b4410a"));
 }
 function cityData() {
   const c = cityColour(), s = css("--surface-1");
@@ -6370,9 +6505,7 @@ function renderStats(shown) {
       icon("close")),
     passportCard(vis, { km, min, booked, apCodes }),
     el("div", { class: "pp-actions" }, el("button", { class: "icon-btn", type: "button", title: "The passport as an image, to share or save",
-                                                       onclick: e => downloadPassport(e.currentTarget) }, icon("share"), "Passport image"),
-      el("button", { class: "icon-btn", type: "button", title: "A square card with your travel figures, to share or save",
-                     onclick: () => shareStatsCard(vis, { km, min, apCodes }) }, icon("share"), "Share my stats")));
+                                                       onclick: e => downloadPassport(e.currentTarget) }, icon("share"), "Passport image")));
 
   const home = countBy(vis, f => [f.from, f.to])[0][0];  // the most visited airport, as on the passport
   const far = [...apCodes].map(c => [c, apKm(home, c)]).sort((a, b) => b[1] - a[1])[0];
@@ -7862,7 +7995,7 @@ async function videoMap(W, H, mapKey) {
   let m;
   try {
     m = new maplibregl.Map({ container: host, style: await mapStyle(videoBase(mapKey), true), interactive: false, attributionControl: false,
-      pixelRatio: 1, fadeDuration: 0, renderWorldCopies: false, center: [0, 20], zoom: 1,
+      pixelRatio: 1, fadeDuration: 0, renderWorldCopies: false, center: [0, 20], zoom: 1, maxTileCacheSize: 800,  // the whole video's tiles stay loaded
       preserveDrawingBuffer: true, canvasContextAttributes: { preserveDrawingBuffer: true, antialias: true } });
   } catch (e) {
     host.remove();
@@ -7876,10 +8009,12 @@ async function videoMap(W, H, mapKey) {
   // night and city lights under the trip's countries
   // the night is a soft shade: worked out up to zoom 3 and enlarged beyond, so zooming in needs no new pieces (a phone
   // takes long enough over them that frames came out without the night)
-  m.addSource("v-night", { type: "geojson", data: empty, maxzoom: 3 });
-  m.addLayer({ id: "v-night", type: "fill", source: "v-night", paint: { "fill-color": "#02030a", "fill-opacity": ["get", "o"], "fill-antialias": false } });
-  m.addSource("v-lights", { type: "image", url: TRANSPARENT_PX, coordinates: MERC_CORNERS });
-  m.addLayer({ id: "v-lights", type: "raster", source: "v-lights", layout: { visibility: "none" }, paint: { "raster-opacity": 0.95, "raster-fade-duration": 0 } });
+  video.nightCanvas = video.nightCanvas || nightCanvas();
+  video.lightsCanvas = video.lightsCanvas || el("canvas", { width: 256, height: 256 });
+  m.addSource("v-night", { type: "canvas", canvas: video.nightCanvas, coordinates: MERC_CORNERS, animate: false });
+  m.addLayer({ id: "v-night", type: "raster", source: "v-night", paint: { "raster-opacity": 1, "raster-fade-duration": 0 } });
+  m.addSource("v-lights", { type: "canvas", canvas: video.lightsCanvas, coordinates: MERC_CORNERS, animate: false });
+  m.addLayer({ id: "v-lights", type: "raster", source: "v-lights", layout: { visibility: "none" }, paint: { "raster-opacity": LIGHTS_OPACITY, "raster-fade-duration": 0 } });
   m.addSource("v-countries", { type: "geojson", data: empty });  // the trip's countries, outlined in neon
   const cc = colourOf(style.country) || P.holo[0];  // Map style's visited countries colour
   m.addLayer({ id: "v-country-fill", type: "fill", source: "v-countries", paint: { "fill-color": cc, "fill-opacity": 0.08 } });
@@ -7887,7 +8022,7 @@ async function videoMap(W, H, mapKey) {
   m.addLayer({ id: "v-country-line", type: "line", source: "v-countries", paint: { "line-color": cc, "line-width": 0.7, "line-opacity": 0.4 } });
   m.addSource("v-clouds", { type: "image", url: CLOUDS_IMG, coordinates: [[-180, 85.05], [180, 85.05], [180, -85.05], [-180, -85.05]] });
   m.addLayer({ id: "v-clouds", type: "raster", source: "v-clouds", layout: { visibility: "none" }, paint: { "raster-fade-duration": 0 } });
-  Object.assign(video, { vmap: m, vmapKey: key, nightAt: null, lightsAt: null });
+  Object.assign(video, { vmap: m, vmapKey: key, nightAt: null, lightsAt: null, lightsArea: null });
   return m;
 }
 // the countries the video's flights touch, for their neon outlines
@@ -7914,50 +8049,65 @@ function updateVideoLayers(m, plan, st) {  // a promise when new city lights are
   let lights = null;
   const night = plan.night && st.utc != null;
   m.setLayoutProperty("v-night", "visibility", night ? "visible" : "none");
-  m.setLayoutProperty("v-lights", "visibility", night ? "visible" : "none");
+  const ownLights = videoBase(plan.mapKey) === "night", lightsOn = night && !ownLights;  // Night lights: the map's own, sharp ones
+  m.setLayoutProperty("v-lights", "visibility", lightsOn ? "visible" : "none");
   if (night && (video.nightAt == null || Math.abs(st.utc - video.nightAt) > 6e5)) {  // every 10 minutes of flight time
-    m.getSource("v-night").setData(nightBands(st.utc, 1.6));
+    paintNight(video.nightCanvas, st.utc, "#02030a", 0.58);
+    showOnNextDraw(m, "v-night");
     video.nightAt = st.utc;
   }
-  if (night && (video.lightsAt == null || Math.abs(st.utc - video.lightsAt) > 36e5)) {  // the city lights: every hour of flight time
-    const at = video.lightsAt = st.utc;
-    lights = lightsImage(at).then(url => { if (video.vmap === m && video.lightsAt === at) m.getSource("v-lights").updateImage({ url, coordinates: MERC_CORNERS }); }).catch(() => {});
+  // the city lights: for the area in view (repainted when the camera leaves it or zooms), every hour of flight time
+  const stale = video.lightsAt == null || Math.abs(st.utc - video.lightsAt) > 36e5 || !areaCovers(video.lightsArea, lightsArea(m));
+  if (lightsOn && stale && video.lightsJob) return video.lightsJob.then(() => video.vmap === m && updateVideoLayers(m, plan, st));  // a download waits, then checks again
+  if (lightsOn && stale) {
+    const at = st.utc, A = lightsArea(m, 0.35);
+    lights = video.lightsJob = paintAreaLights(video.lightsCanvas, A, at).then(corners => {
+      if (video.vmap !== m) return;
+      m.getSource("v-lights").setCoordinates(corners);
+      Object.assign(video, { lightsAt: at, lightsArea: A });
+      showOnNextDraw(m, "v-lights");
+    }).catch(() => {}).finally(() => { video.lightsJob = null; });
   }
   m.setLayoutProperty("v-clouds", "visibility", plan.clouds ? "visible" : "none");
   if (plan.clouds) m.setPaintProperty("v-clouds", "raster-opacity", 0.3 + 0.55 * smooth(1200, 9000, st.km));
   return lights;
 }
-// until the map has drawn a source's latest data for this view (at most ms)
-const sourceReady = (m, id, ms) => new Promise(res => {
-  m.redraw();
-  if (m.isSourceLoaded(id)) return res();
-  const done = () => { clearTimeout(t); m.off("sourcedata", check); res(); }, check = () => { if (m.isSourceLoaded(id)) done(); }, t = setTimeout(done, ms);
-  m.on("sourcedata", check);
-});
+// until the tiles for the current view have arrived (at most ms). The map is drawn once first, which asks for the view's
+// tiles, and checked as each tile arrives – not on the next screen refresh, which a background tab doesn't get
 const mapSettled = (m, ms) => new Promise(res => {
+  m.redraw();
   if (m.areTilesLoaded()) return res();
-  const t = setTimeout(res, ms);
-  m.once("idle", () => { clearTimeout(t); res(); });
+  const done = () => { clearTimeout(t); m.off("data", check); res(); }, check = () => { if (m.areTilesLoaded()) done(); }, t = setTimeout(done, ms);
+  m.on("data", check);
 });
-// before playing, visit the main camera positions so their map tiles are downloading, and wait until they arrive (max ~7 s)
+// before playing, fly the whole video once without showing it: every camera position about every half second, so all
+// its map tiles are loaded and kept (the first play no longer stutters or shows missing pieces); at most ~30 s
 async function preloadVideoTiles(plan, W, H) {
   if (!plan.tiled) return;
   const m = await videoMap(W, H, plan.mapKey), t0 = Date.now();
   videoCountries(m);
-  if (plan.night) { const st = videoState(plan, 0); if (st.utc != null) { video.lightsAt = st.utc; m.getSource("v-lights").updateImage({ url: await lightsImage(st.utc), coordinates: MERC_CORNERS }); } }
-  const times = [0, plan.legs[0].start, ...plan.legs.flatMap(l => [l.start + 0.3, (l.start + l.end) / 2, l.end - 0.3]), plan.end];
-  for (const t of times) {
-    aimVideoMap(m, videoState(plan, t), W, H);
-    await mapSettled(m, 900);
-    if (Date.now() - t0 > 7000) break;
+  const steps = Math.max(12, Math.ceil(plan.end / 0.5)), run = video.run;
+  for (let i = 0; i <= steps; i++) {
+    if (run !== video.run || $("videoModal").hidden) return;
+    const st = videoState(plan, plan.end * i / steps);
+    aimVideoMap(m, st, W, H);
+    await mapSettled(m, 2500);
+    if (plan.night && st.utc != null) await updateVideoLayers(m, plan, st);  // and the city-light tiles for this view
+    const pct = Math.round(100 * i / steps);
+    $("videoStatus").textContent = `Loading map… ${pct} %`;
+    if (!$("videoProgress").hidden) videoProgress("Loading the map…", i / steps, "Getting ready to draw your video");
+    if (Date.now() - t0 > 30000) break;
   }
   aimVideoMap(m, videoState(plan, 0), W, H);
+  if (plan.night) { const st = videoState(plan, 0); if (st.utc != null) { video.nightAt = null; video.lightsAt = null; await updateVideoLayers(m, plan, st); } }
   await mapSettled(m, 2500);
 }
 // while rendering a download frame by frame: give map tiles that are still arriving a moment (max ~0.6 s)
 async function settleTiles() {
   if (video.vmap) await mapSettled(video.vmap, 600);
 }
+// let the page breathe between frames without a timer: timers wait at least 4 ms, and up to a second in a background tab
+const yieldNow = () => new Promise(res => { const ch = new MessageChannel(); ch.port1.onmessage = () => res(); ch.port2.postMessage(0); });
 function waitForLogos() {
   const imgs = [...new Set(video.flights.map(f => DATA.logos[f.airline]).filter(Boolean))].map(c => video.logos[c]).filter(Boolean)
     .concat(Object.keys(TIME_ICONS).flatMap(k => ["dark", "light"].map(m => timeIconImage(k, themeTokens(m).muted, themeTokens(m).card))));  // as the cards draw them
@@ -8029,6 +8179,7 @@ function drawVideoFrame(ctx, W, H, plan, t) {
     const m = video.vmap, { R, cx, cy } = aimVideoMap(m, st, W, H);
     updateVideoLayers(m, plan, st);
     m.redraw();
+    afterVideoDraw();
     drawSpace(ctx, W, H);
     // the atmosphere: a glow around the globe's visible edge (seen in perspective from 1.5 frame heights, the edge is
     // nearer the centre than R)
@@ -8113,12 +8264,24 @@ function drawStylisedGlobe(ctx, W, H, proj, R, utc, cy = H / 2) {
   ctx.beginPath(); path({ type: "FeatureCollection", features: countriesGeo || [] });
   ctx.fillStyle = land; ctx.fill();
   ctx.strokeStyle = P.landEdge; ctx.lineWidth = 0.6; ctx.stroke();
-  if (utc != null) {  // night side, darkest away from the sun, with a soft twilight edge
-    const [lon, lat] = subsolarPoint(utc), anti = [lon + 180, -lat];
-    for (const [r, a] of [[97, 0.12], [93, 0.15], [89, 0.18], [84, 0.25]]) {
-      ctx.beginPath(); path(d3.geoCircle().center(anti).radius(r)());
-      ctx.fillStyle = `rgba(${P.night},${a})`; ctx.fill();
+  if (utc != null) {  // night side, darkest away from the sun, with a smooth twilight
+    const k = 4, w = Math.ceil(W / k), h = Math.ceil(H / k);
+    const c = video.globeNight = video.globeNight && video.globeNight.width === w && video.globeNight.height === h ? video.globeNight : el("canvas", { width: w, height: h });
+    const g = c.getContext("2d"), img = g.createImageData(w, h), d = img.data, [nr, ng, nb] = P.night.split(",").map(Number);
+    const r = Math.PI / 180, [sl, sp] = d3.geoRotation(proj.rotate())(subsolarPoint(utc)).map(v => v * r);
+    const sx = Math.cos(sp) * Math.sin(sl), sy = Math.sin(sp), sz = Math.cos(sp) * Math.cos(sl), cx = W / 2;
+    for (let j = 0, i = 0; j < h; j++) {
+      const y = (cy - (j + 0.5) * k) / R;
+      for (let q = 0; q < w; q++, i += 4) {
+        const x = ((q + 0.5) * k - cx) / R, zz = 1 - x * x - y * y;
+        d[i] = nr; d[i + 1] = ng; d[i + 2] = nb;
+        d[i + 3] = zz <= 0 ? 0 : Math.round(255 * 0.56 * nightShare(x * sx + y * sy + Math.sqrt(zz) * sz));
+      }
     }
+    g.putImageData(img, 0, 0);
+    ctx.save(); ctx.beginPath(); path({ type: "Sphere" }); ctx.clip();
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high"; ctx.drawImage(c, 0, 0, w * k, h * k);
+    ctx.restore();
   }
 }
 
@@ -8875,9 +9038,15 @@ function videoProgress(text, done = null, note = "") {
 }
 async function exportVideo() {
   const [W, H] = EXPORT_FORMATS[$("videoFormat").value];
-  const config = { codec: "avc1.640032", width: W, height: H, bitrate: 16e6, framerate: FPS, avc: { format: "avc" } };
-  let supported = false;
-  try { supported = !!(window.VideoEncoder && window.VideoFrame && (await VideoEncoder.isConfigSupported(config)).supported); } catch (e) { /* not supported */ }
+  // the graphics chip's encoder when there is one (many times faster than the software one, same quality settings)
+  let config = { codec: "avc1.640032", width: W, height: H, bitrate: 16e6, framerate: FPS, avc: { format: "avc" } }, supported = false;
+  try {
+    if (window.VideoEncoder && window.VideoFrame) {
+      const hw = { ...config, hardwareAcceleration: "prefer-hardware" };
+      if ((await VideoEncoder.isConfigSupported(hw)).supported) { config = hw; supported = true; }
+      else supported = !!(await VideoEncoder.isConfigSupported(config)).supported;
+    }
+  } catch (e) { /* not supported */ }
   if (!supported) return playVideo(true);
   cancelAnimationFrame(video.raf);
   saveVideoPrefs();
@@ -8895,29 +9064,31 @@ async function exportVideo() {
     encoder.configure(config);
     const canvas = $("videoCanvas"), ctx = canvas.getContext("2d");
     const frames = Math.ceil(plan.end * FPS) + 1, started = performance.now();
+    let stuck = false;
     for (let i = 0; i < frames; i++) {
       if (run !== video.run || $("videoModal").hidden) { $("videoStatus").textContent = "Download cancelled"; return; }
       if (failure) throw failure;
       const t = Math.min(i / FPS, plan.end);
       if (plan.tiled) {  // point the camera first so this frame's tiles start loading, then give them a moment
         aimVideoMap(video.vmap, videoState(plan, t), W, H);
-        await (i % 6 === 0 ? settleTiles() : sleep(0));
-        if (plan.night) {  // the download waits for the night and the city lights, which a live preview can't
-          await updateVideoLayers(video.vmap, plan, videoState(plan, t));
-          await sourceReady(video.vmap, "v-night", 1500);
-          await sourceReady(video.vmap, "v-lights", 1500);
-        }
+        // the preload fetched them: normally nothing to wait for. A tile that doesn't come (a slow server) is waited for
+        // on every sixth frame only, as before, so it can't hold up each frame
+        if (!video.vmap.areTilesLoaded() && (i % 6 === 0 || !stuck)) { await settleTiles(); stuck = !video.vmap.areTilesLoaded(); }
+        if (plan.night) await updateVideoLayers(video.vmap, plan, videoState(plan, t));  // the download waits for the city lights
         if (run !== video.run || $("videoModal").hidden) { $("videoStatus").textContent = "Download cancelled"; return; }
       }
       drawVideoFrame(ctx, W, H, plan, t);
       const frame = new VideoFrame(canvas, { timestamp: Math.round(i * 1e6 / FPS), duration: Math.round(1e6 / FPS) });
       encoder.encode(frame, { keyFrame: i % (FPS * 2) === 0 });
       frame.close();
-      while (encoder.encodeQueueSize > 6) await sleep(4);
-      const left = i > 15 ? Math.round((performance.now() - started) / i * (frames - i) / 1000) : null;
-      videoProgress(`Making your video… ${Math.round(100 * i / frames)} %`, i / frames,
-        `Frame ${i + 1} of ${frames}${left == null ? "" : left > 90 ? ` · about ${Math.round(left / 60)} min left` : ` · about ${Math.max(1, left)} s left`}`);
-      if (i % 5 === 0) { $("videoStatus").textContent = `Rendering video… ${Math.round(100 * i / frames)} %`; await sleep(0); }
+      while (encoder.encodeQueueSize > 8) await Promise.race([new Promise(res => encoder.addEventListener("dequeue", res, { once: true })), sleep(20)]);  // the encoder works alongside
+      if (i % 5 === 0) {
+        const left = i > 15 ? Math.round((performance.now() - started) / i * (frames - i) / 1000) : null;
+        videoProgress(`Making your video… ${Math.round(100 * i / frames)} %`, i / frames,
+          `Frame ${i + 1} of ${frames}${left == null ? "" : left > 90 ? ` · about ${Math.round(left / 60)} min left` : ` · about ${Math.max(1, left)} s left`}`);
+        $("videoStatus").textContent = `Rendering video… ${Math.round(100 * i / frames)} %`;
+        await yieldNow();
+      }
     }
     videoProgress("Saving the video…", 1);
     await encoder.flush();
@@ -9306,10 +9477,15 @@ function slidePills() {
   document.fonts && document.fonts.ready.then(later);
   later();
 }
-// text cut off with … shows in full on hover (when it has no hover text of its own)
+// text cut off with … shows in full on hover (when it has no hover text of its own). Only text really cut with an
+// ellipsis: a scrolling box is also wider than it shows (Windows scrollbars), and must not get a whole tab's text as a tooltip
 document.addEventListener("mouseover", e => {
   const t = e.target;
-  if (t.nodeType === 1 && !t.title && t.scrollWidth > t.clientWidth + 1 && t.textContent.trim()) t.title = t.textContent.trim();
+  if (t.nodeType !== 1 || t.title) return;
+  const cs = getComputedStyle(t), text = t.textContent.trim();
+  const cut = cs.textOverflow === "ellipsis" ? t.scrollWidth > t.clientWidth + 1
+    : cs.webkitLineClamp && cs.webkitLineClamp !== "none" ? t.scrollHeight > t.clientHeight + 1 : false;
+  if (cut && text && text.length <= 200) t.title = text;
 });
 new ResizeObserver(([e]) => document.documentElement.style.setProperty("--controls-h", e.target.offsetHeight + "px"))
   .observe(document.querySelector(".controls"));
@@ -9454,6 +9630,21 @@ function renderAbout() {
   const flown = ALL.filter(f => !f.future);
   $("abFlights").textContent = fmt(flown.length);
   $("abSince").textContent = flown.length ? Math.min(...flown.map(f => +f.date.slice(0, 4))) : "–";
+  // what each source adds: the share of flights flown with that detail
+  $("abFlown").textContent = fmt(flown.length);
+  const timed = f => f.real && (f.real.ao || f.real.off || f.real.on || f.real.ad != null);
+  $("abCover").replaceChildren(...[
+    ["Registration", "FlightMemory · FlightAware", f => f.reg],
+    ["Exact model and age", "OpenSky aircraft database · CASA", f => f.age != null],
+    ["Photo of the aircraft", "Planespotters.net", f => f.photo],
+    ["Actual times", "OpenSky · FlightAware", timed],
+    ["Path actually flown", "OpenSky · FlightAware", f => f.tk],
+  ].map(([name, from, has]) => {
+    const n = flown.filter(has).length, pct = flown.length ? Math.round(100 * n / flown.length) : 0;
+    return el("div", { class: "ab-bar", role: "listitem", "aria-label": `${name}: ${n} of ${flown.length} flights (${pct}%), from ${from}` },
+      el("b", { text: name }), el("span", { class: "v" }, `${pct}%`, el("em", { text: ` · ${fmt(n)}` })), el("small", { text: from }),
+      el("span", { class: "track" }, el("i", { style: `width:${pct}%` })));
+  }));
   if (!CONTACT.url) { $("abSend").disabled = true; $("abStatus").textContent = "Messages open soon."; }
 }
 document.querySelectorAll("[data-goto]").forEach(b => b.addEventListener("click", () => {
