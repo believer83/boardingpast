@@ -2,7 +2,7 @@
 // - the page: from the network when it answers within a few seconds (a newer build wins), else the saved copy
 // - the app's own files, the map library, fonts and map styles: kept for good (styles refreshed in the background)
 // - map tiles: every tile you have looked at, kept up to a limit (oldest dropped first), so maps you have seen work offline
-const PAGE = "index.html", WORLD = "world_airports.js?v=57c399de27", TRACKS = "flight_tracks.js?v=07a0750e2a", ICONS = ["brand/app-icon/boarding-past-app-icon-rounded-192.png", "brand/app-icon/boarding-past-app-icon-rounded-512.png", "brand/app-icon/boarding-past-app-icon-512.png", "brand/app-icon/boarding-past-app-icon-1024.png"];
+const PAGE = "index.html", WORLD = "world_airports.js?v=57c399de27", TRACKS = "flight_tracks.js?v=9558b7a3a1", ICONS = ["brand/app-icon/boarding-past-app-icon-rounded-192.png", "brand/app-icon/boarding-past-app-icon-rounded-512.png", "brand/app-icon/boarding-past-app-icon-512.png", "brand/app-icon/boarding-past-app-icon-1024.png"];
 const APP = "boarding-past-app-v6", TILES = "boarding-past-tiles-v1", MAX_TILES = 3000, PAGE_WAIT = 4000;
 const SHOTS = "boarding-past-trip-maps-v1";  // the trip maps' pictures, kept by the page itself: not cleared here
 const LIBS = ["https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js", "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json", "https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js", "https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css"];  // the map library and country shapes, from the page's CDN list
