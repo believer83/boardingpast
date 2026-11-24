@@ -2,7 +2,7 @@
 // - the page: from the network when it answers within a few seconds (a newer build wins), else the saved copy
 // - the app's own files, the map library, fonts and map styles: kept for good (styles refreshed in the background)
 // - map tiles: every tile you have looked at, kept up to a limit (oldest dropped first), so maps you have seen work offline
-const PAGE = "index.html", WORLD = "world_airports.js?v=57c399de27", TRACKS = "flight_tracks.js?v=9558b7a3a1", ICONS = ["brand/app-icon/boarding-past-app-icon-rounded-192.png", "brand/app-icon/boarding-past-app-icon-rounded-512.png", "brand/app-icon/boarding-past-app-icon-512.png", "brand/app-icon/boarding-past-app-icon-1024.png"];
+const PAGE = "index.html", WORLD = "world_airports.js?v=57c399de27", TRACKS = "flight_tracks.js?v=9558b7a3a1", SYMBOLS = "airline_symbols.js?v=a63fb1239f", ICONS = ["brand/app-icon/boarding-past-app-icon-rounded-192.png", "brand/app-icon/boarding-past-app-icon-rounded-512.png", "brand/app-icon/boarding-past-app-icon-512.png", "brand/app-icon/boarding-past-app-icon-1024.png"];
 const APP = "boarding-past-app-v6", TILES = "boarding-past-tiles-v1", MAX_TILES = 3000, PAGE_WAIT = 4000;
 const SHOTS = "boarding-past-trip-maps-v1";  // the trip maps' pictures, kept by the page itself: not cleared here
 const LIBS = ["https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js", "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json", "https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js", "https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css"];  // the map library and country shapes, from the page's CDN list
@@ -11,12 +11,20 @@ const isStyle = url => url.hostname === "tiles.openfreemap.org" || /\/(styles|fo
 
 self.addEventListener("install", e => {
   self.skipWaiting();
-  // one missing file must not stop the rest being saved
-  e.waitUntil(caches.open(APP).then(c => Promise.all([PAGE, WORLD, TRACKS, "manifest.webmanifest", ...ICONS, ...LIBS].map(u => c.add(u).catch(() => {})))));
+  // the page and its icons straight away (one missing file must not stop the rest being saved)
+  e.waitUntil(caches.open(APP).then(c => Promise.all([PAGE, "manifest.webmanifest", ...ICONS].map(u => c.add(u).catch(() => {})))));
 });
+// the rest of what works offline (the data files, the map library, the country shapes), saved afterwards one file at a
+// time, so it never crowds out what the page is loading itself; files the page has already fetched (and so saved) are skipped
+async function warm() {
+  const c = await caches.open(APP);
+  for (const u of [SYMBOLS, TRACKS, ...LIBS, WORLD]) {
+    try { if (!(await c.match(u))) await c.add(u); } catch (err) { /* offline or refused: tried again next time */ }
+  }
+}
 self.addEventListener("activate", e => e.waitUntil(
   caches.keys().then(keys => Promise.all(keys.filter(k => (k.startsWith("boarding-past-") || k.startsWith("contreel-")) && k !== APP && k !== TILES && k !== SHOTS).map(k => caches.delete(k))))
-    .then(() => self.clients.claim())));
+    .then(() => self.clients.claim()).then(() => { setTimeout(warm, 4000); })));
 
 let puts = 0;
 async function keepTile(req, res) {
@@ -39,6 +47,7 @@ self.addEventListener("fetch", e => {
   if (!/^https?:$/.test(url.protocol)) return;
   // the page: network first, but not waiting forever on a weak connection
   if (url.origin === location.origin && (req.mode === "navigate" || url.pathname.endsWith("/" + PAGE))) {
+    if (req.mode === "navigate") e.waitUntil(new Promise(res => setTimeout(res, 8000)).then(warm));  // fill in what the offline copy still lacks, once the page is up
     e.respondWith((async () => {
       const net = fetch(req).then(r => { if (r.ok) save(APP, PAGE, r.clone()); return r; });
       const late = new Promise(res => setTimeout(res, PAGE_WAIT));
