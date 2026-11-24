@@ -6595,12 +6595,10 @@ document.fonts.ready.then(fitTable);
 function renderTable(vis) {
   const { key, dir } = state.sort;
   const col = COLS.find(c => c.key === key);
-  const tripStart = new Map(TRIPS.map(t => [t.label, t.flights[0].sortKey]));
+  // by departure the flat list is in strict date order, newest first by default (By trip keeps each trip's flights in
+  // the order flown, inside its own block); with the year headings, trips listed newest first but flown oldest first
+  // made the numbers zigzag (254 255 252 253…)
   const rows = [...vis].sort((a, b) => {
-    if (key === "date" && dir < 0) {  // newest trips first, but the flights inside a trip in the order they were flown
-      const ta = tripStart.get(a.trip), tb = tripStart.get(b.trip);
-      return ta !== tb ? (ta < tb ? 1 : -1) : a.sortKey < b.sortKey ? -1 : 1;
-    }
     const x = col.val(a), y = col.val(b);
     return (x < y ? -1 : x > y ? 1 : 0) * dir || (a.sortKey < b.sortKey ? 1 : -1);
   });
