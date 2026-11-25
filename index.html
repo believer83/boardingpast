@@ -13,6 +13,7 @@
 <link rel="apple-touch-icon" href="brand/app-icon/boarding-past-app-icon-rounded-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- the font's stylesheet doesn't hold up the page: it applies once it arrives (the text shows in the system font until then) -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;600;700;800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;600;700;800&display=swap"></noscript>
@@ -2397,13 +2398,25 @@ table.flights tr.tr-row:hover { background: none; }
 html.video-open { overflow: hidden; }
 .video-box { position: relative; width: min(1100px, 100%); height: 100%; max-height: calc(100dvh - 32px); display: flex; flex-direction: column; gap: 12px; }
 /* while a video downloads: a card over it, with the step, the percentage and a bar */
-.video-progress { position: absolute; left: 50%; top: 55%; transform: translate(-50%, -50%); z-index: 2; width: min(300px, calc(100% - 32px)); display: grid; gap: 10px;
-  padding: 16px 18px; border-radius: 16px; background: rgba(10,8,30,.88); border: 1px solid rgba(255,255,255,.14); color: #fff; box-shadow: 0 12px 40px rgba(0,0,0,.5);
+.video-progress { position: absolute; left: 50%; top: 55%; transform: translate(-50%, -50%); z-index: 2; width: min(320px, calc(100% - 32px)); display: grid; gap: 10px;
+  padding: 18px 20px; border-radius: 18px; background: rgba(10,8,30,.82); border: 1px solid rgba(255,255,255,.14); color: #fff; box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 40px -12px var(--glow);
+  animation: vp-in .25s ease;
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 14px; font-weight: 600; text-align: center; }
 .video-progress[hidden] { display: none; }
 .video-progress small { color: rgba(255,255,255,.65); font-weight: 500; font-size: 12px; }
-.video-progress .vp-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.16); overflow: hidden; }
-.video-progress .vp-bar b { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--grad); transition: width .2s; }
+.video-progress .vp-bar { height: 10px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,.4); }
+.video-progress .vp-bar b { position: relative; display: block; height: 100%; width: 0; border-radius: 999px; background: var(--grad); background-size: 320px 100%;
+  box-shadow: 0 0 12px var(--glow); transition: width .35s ease; overflow: hidden; }
+.video-progress .vp-bar b::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
+  transform: translateX(-100%); animation: vp-shine 1.6s ease-in-out infinite; }  /* a soft light running along the gauge */
+@keyframes vp-shine { to { transform: translateX(100%); } }
+@keyframes vp-in { from { opacity: 0; transform: translate(-50%, -46%); } }
+.video-progress .vp-pct { font: 800 34px/1 Sora, system-ui, sans-serif; letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+  background: var(--grad-text, var(--grad)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.video-progress .vp-pct:empty { display: none; }
+.video-progress button { display: none; }
+.video-progress.dl button { display: inline-block; }
+@media (prefers-reduced-motion: reduce) { .video-progress, .video-progress .vp-bar b::after { animation: none; } }
 .video-progress .vp-bar.busy b { width: 35%; animation: vp-busy 1.2s ease-in-out infinite alternate; }  /* no percentage yet */
 @keyframes spin { to { transform: rotate(1turn); } }
 @keyframes vp-busy { from { transform: translateX(-100%); } to { transform: translateX(285%); } }
@@ -3357,7 +3370,7 @@ td.empty-cell { cursor: default; }
     </div>
     <canvas id="videoCanvas"></canvas>
     <div class="video-progress" id="videoProgress" hidden role="status" aria-live="polite">
-      <span id="vpText"></span><div class="vp-bar" id="vpBar"><b></b></div><small id="vpNote"></small>
+      <span id="vpText"></span><b class="vp-pct" id="vpPct"></b><div class="vp-bar" id="vpBar"><b></b></div><small id="vpNote"></small>
       <button type="button" id="vpCancel">Cancel</button>
     </div>
   </div>
@@ -4693,6 +4706,7 @@ async function makeImage(fl, past, format, step = () => {}) {
 let imageBusy = false, imageMenuY = 0;
 function closeImageMenu() { if (!imageBusy) $("imgMenu").hidden = true; }
 function openImageMenu(btn, fl, past) {
+  loadScript(CDN.htmlToImage).catch(() => {});  // the picture maker on its way while a format is chosen
   const menu = $("imgMenu");
   if (imageBusy) return;
   const opener = menu.opener, open = !menu.hidden;
@@ -4734,6 +4748,7 @@ addEventListener("scroll", () => { if (Math.abs(scrollY - imageMenuY) > 60) clos
 function openPlayMenu(btn, what, start) {
   const menu = $("imgMenu");
   if (imageBusy) return;
+  warmVideo();
   const opener = menu.opener, open = !menu.hidden;
   closeImageMenu();
   if (open && opener === btn) return;
@@ -4835,6 +4850,16 @@ function nextShot() {
   let best = 0;
   shotQueue.forEach((p, i) => { if (dist(p) < dist(shotQueue[best])) best = i; });
   return shotQueue.splice(best, 1)[0];
+}
+// (on a first visit there are none yet: they are drawn when the Travel log opens, and saved for next time)
+async function warmTripShots() {
+  if (shotsOff) return;
+  for (const t of [...TRIPS].reverse().slice(0, TRIP_PAGE)) {
+    const key = shotKey(t.flights);
+    if (tripShots.has(key)) continue;
+    const stored = await storedShot(key, t.flights);
+    if (stored) keepShot(key, stored);
+  }
 }
 async function pumpShots() {
   if (shotBusy) return;
@@ -5439,9 +5464,53 @@ function saveStyle() {
   try { localStorage.setItem(STYLE_KEY, JSON.stringify(style)); } catch (e) { /* storage unavailable */ }
 }
 // a new map type (or theme): restyle the map; our layers are added back when the new style has loaded
+// A theme change only changes the look of the theme's maps: the base map's layers are changed in place (new colours, and
+// for light <-> dark the few layers one style has and the other hasn't), leaving the page's own layers (routes, airports,
+// countries, night: "cr-…") and their data alone, so the map changes colour without going blank and loading again.
+// Another map type, or to or from a picture map, is loaded afresh; a map type with its own colours (Satellite,
+// Streets…) doesn't change with the theme at all
+let appliedBase = null;
 function applyBase() {
   if (!map) return;
-  mapStyle(baseKey()).then(st => map.setStyle(st, { diff: false })).catch(() => {});
+  const key = baseKey(), was = appliedBase;
+  if (key === was && !BASEMAPS[key].themed) return;
+  appliedBase = key;
+  mapStyle(key).then(st => {
+    if (appliedBase !== key) return;  // changed again meanwhile
+    if (was && BASEMAPS[was].themed && BASEMAPS[key].themed && restyleInPlace(st)) applySky();
+    else map.setStyle(st, { diff: false });
+  }).catch(() => {});
+}
+function restyleInPlace(st) {
+  try {
+    const own = id => id.startsWith("cr-"), same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+    for (const [k, src] of Object.entries(st.sources)) if (!map.getSource(k)) map.addSource(k, src);
+    const want = new Set(st.layers.map(l => l.id));
+    for (const id of map.getLayersOrder()) if (!own(id) && !want.has(id)) map.removeLayer(id);
+    const order = map.getLayersOrder(), lastBase = order.reduce((n, id, i) => own(id) ? n : i, -1);
+    const ownOnTop = order.slice(lastBase + 1).find(own);  // the page's layers above the base map (routes…): new base layers go under them
+    st.layers.forEach((l, i) => {
+      let old = map.getLayer(l.id) && map.getLayer(l.id).serialize();
+      if (old && (old.type !== l.type || old.source !== l.source || old["source-layer"] !== l["source-layer"])) { map.removeLayer(l.id); old = null; }
+      if (!old) {
+        map.addLayer(l, st.layers.slice(i + 1).map(x => x.id).find(id => map.getLayer(id)) || ownOnTop);
+        return;
+      }
+      for (const k of new Set([...Object.keys(old.paint || {}), ...Object.keys(l.paint || {})]))
+        if (!same(old.paint && old.paint[k], l.paint && l.paint[k])) map.setPaintProperty(l.id, k, l.paint ? l.paint[k] : undefined);
+      for (const k of new Set([...Object.keys(old.layout || {}), ...Object.keys(l.layout || {})]))
+        if (!same(old.layout && old.layout[k], l.layout && l.layout[k])) map.setLayoutProperty(l.id, k, l.layout ? l.layout[k] : undefined);
+      if (!same(old.filter, l.filter)) map.setFilter(l.id, l.filter ?? null);
+      if ((old.minzoom ?? 0) !== (l.minzoom ?? 0) || (old.maxzoom ?? 24) !== (l.maxzoom ?? 24)) map.setLayerZoomRange(l.id, l.minzoom ?? 0, l.maxzoom ?? 24);
+    });
+    return true;
+  } catch (e) { console.warn("Map restyled afresh:", e); return false; }
+}
+function applySky() {
+  try {  // the atmosphere around the globe, in the theme's colour
+    map.setSky({ "sky-color": "#000000", "horizon-color": pal().atmosphere, "fog-color": pal().atmosphere, "sky-horizon-blend": 0.6,
+                 "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 2.5, 1, 4, 0] });
+  } catch (e) { /* older style spec */ }
 }
 function rgb(hex) { const n = parseInt(hex.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
 // WCAG contrast between two colours, and a colour moved toward white (dark land) or black (light land) until it reaches
@@ -5496,7 +5565,8 @@ function ensureMap() {
     return mapLoading = Promise.reject(new Error(NO_WEBGL));
   }
   return mapLoading = Promise.all([loadScript(CDN.maplibre), loadCss(CDN.maplibreCss), getStyleJson("dark")]).then(async () => {
-    map = new maplibregl.Map({ container: "map", style: await mapStyle(baseKey()), center: [60, 15], zoom: 0.4, minZoom: 0.4, maxZoom: 16,
+    appliedBase = baseKey();
+    map = new maplibregl.Map({ container: "map", style: await mapStyle(appliedBase), center: [60, 15], zoom: 0.4, minZoom: 0.4, maxZoom: 16,
       maxPitch: 70, maxCanvasSize: [8192, 8192], attributionControl: { compact: true } });
     // an icon a base map style names but its sprite sheet lacks (OpenFreeMap's "circle-11"): a blank one, not a console warning
     map.on("styleimagemissing", e => { if (!map.hasImage(e.id)) map.addImage(e.id, { width: 1, height: 1, data: new Uint8Array(4) }); });
@@ -5593,10 +5663,7 @@ function addMapLayers(m) {
 }
 function onMapStyle() {
   map.setProjection(PROJECTION());
-  try {  // the atmosphere around the globe, in the theme's colour
-    map.setSky({ "sky-color": "#000000", "horizon-color": pal().atmosphere, "fog-color": pal().atmosphere, "sky-horizon-blend": 0.6,
-                 "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 2.5, 1, 4, 0] });
-  } catch (e) { /* older style spec */ }
+  applySky();
   if (!map.getSource("dem")) map.addSource("dem", DEM);
   if (!map.hasImage("cr-plane")) map.addImage("cr-plane", planeIcon(), { pixelRatio: 2 });
   addMapLayers(map);
@@ -6170,14 +6237,30 @@ function brandColour(canvas) {
   const best = [...bins.values()].sort((a, b) => b.n - a.n)[0];
   return best && best.n > 8 ? `rgb(${Math.round(best.r / best.n)},${Math.round(best.g / best.n)},${Math.round(best.b / best.n)})` : null;
 }
+// kept in the browser for 30 days (not the embedded logos of defunct airlines: those are in the page already)
+const LOGO_STORE = "flightmap.logo1.", LOGO_DAYS = 30;
+function storedLogo(code) {
+  if (code.startsWith("data:")) return null;
+  try {
+    const v = JSON.parse(localStorage.getItem(LOGO_STORE + code) || "null");
+    return v && Date.now() - v.t < LOGO_DAYS * 864e5 ? v.art : null;
+  } catch (e) { return null; }
+}
+function storeLogo(code, art) {
+  if (code.startsWith("data:") || !art) return;
+  try { localStorage.setItem(LOGO_STORE + code, JSON.stringify({ t: Date.now(), art })); } catch (e) { /* full or unavailable */ }
+}
 function logoVariants(code) {
+  if (!logoArt.has(code) && storedLogo(code)) logoArt.set(code, Promise.resolve(storedLogo(code)));
   if (!logoArt.has(code)) logoArt.set(code, new Promise(done => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => idle(() => {  // the pixel work waits for an idle moment, so scrolling and clicks stay smooth
       try {
         const light = trimCanvas(clearWhiteBox(img));
-        done({ light: light.toDataURL(), dark: needsLift(light) ? liftDark(light).toDataURL() : null, color: brandColour(light) });
+        const art = { light: light.toDataURL(), dark: needsLift(light) ? liftDark(light).toDataURL() : null, color: brandColour(light) };
+        storeLogo(code, art);
+        done(art);
       } catch (e) { done(null); }  // unreadable image: shown as it is
     });
     img.onerror = () => done(null);
@@ -8461,6 +8544,7 @@ const closeKm = km => Math.min(2200, Math.max(CLOSE_KM, cruiseKm(km) * 0.2));
 // every flight video (logged flights, trips, Your reel) goes through here with the same options;
 // cards: false starts it without the boarding-pass strip (Your reel with Show flight card unticked)
 function openVideo(flights, title, cards = true, fromReel = false) {
+  clearTimeout(video.releaseTimer);
   video.fromReel = fromReel;
   if (!cards) $("videoCardTheme").value = "off";
   else if ($("videoCardTheme").value === "off") $("videoCardTheme").value = savedCardTheme();
@@ -8486,6 +8570,20 @@ function checkVideoWebgl() {
     video.note = "Showing the Stylised map: the photo maps need WebGL, which your browser refused. " +
                  "Turn on hardware acceleration in the browser settings and reload to use them.";
   }
+}
+// while the ▶ menu is open: the video's libraries, and its map in the last format and map type used (most of the time the
+// one chosen again), so the video starts loading its route at once; let go after a while if no video follows
+function warmVideo() {
+  clearTimeout(video.releaseTimer);
+  const k = $("videoMap").value, tiled = VIDEO_MAPS[k].map && webglAvailable();
+  prepareVideo().then(() => tiled ? videoMap(...VIDEO_FORMATS[$("videoFormat").value], k) : null)
+    .then(() => { if ($("videoModal").hidden) releaseVideoMapLater(); }).catch(() => {});
+}
+// the hidden video map is kept a little after a video closes, so the next one (another trip, same format and map type)
+// skips making it again; browsers allow only a few such maps, so it goes after 90 s
+function releaseVideoMapLater() {
+  clearTimeout(video.releaseTimer);
+  video.releaseTimer = setTimeout(() => { if ($("videoModal").hidden) releaseVideoMap(); }, 90000);
 }
 function prepareVideo() {
   const tiled = VIDEO_MAPS[$("videoMap").value].map;
@@ -8527,7 +8625,7 @@ function closeVideo() {
   cancelAnimationFrame(video.raf);
   video.run = null;  // stops a download or a map preload still in progress
   videoProgress(null);
-  releaseVideoMap();
+  releaseVideoMapLater();
   if (video.recorder && video.recorder.state === "recording") video.recorder.stop();
   $("videoModal").hidden = true;
   document.documentElement.classList.remove("video-open");
@@ -8537,7 +8635,7 @@ function closeVideo() {
 function releaseVideoMap() {
   if (video.vmap) try { video.vmap.remove(); } catch (e) { /* already gone */ }
   $("videoMapHost")?.remove();
-  Object.assign(video, { vmap: null, vmapKey: null, nightAt: null });
+  Object.assign(video, { vmap: null, vmapKey: null, nightAt: null, walked: null });
 }
 
 /* Timeline: (the departure board), intro zoom, one segment per flight (time ~ sqrt(distance)) with a stop between,
@@ -8993,6 +9091,15 @@ async function preloadVideoTiles(plan, W, H) {
   if (!plan.tiled) return;
   const m = await videoMap(W, H, plan.mapKey), t0 = Date.now();
   videoCountries(m);
+  // the walk along the camera's path loads every tile the video will need; an option that doesn't move the camera (clouds,
+  // country names, cards, their colours, or the night once its city lights are in) needs no new walk
+  const path = [video.vmapKey, plan.end.toFixed(2), plan.lead || 0, plan.tilt ? 1 : 0, state.real.tracks ? 1 : 0, video.flights.map(f => f.id).join()].join("|");
+  if (video.walked && video.walked.path === path && (!plan.night || video.walked.night)) {
+    aimVideoMap(m, videoState(plan, 0), W, H);
+    if (plan.night) { const st = videoState(plan, 0); if (st.utc != null) { video.nightAt = null; video.lightsAt = null; await updateVideoLayers(m, plan, st); } }
+    await mapSettled(m, 2500);
+    return;
+  }
   const steps = Math.max(12, Math.ceil(plan.end / 0.5)), run = video.run;
   for (let i = 0; i <= steps; i++) {
     if (run !== video.run || $("videoModal").hidden) return;
@@ -9000,11 +9107,10 @@ async function preloadVideoTiles(plan, W, H) {
     aimVideoMap(m, st, W, H);
     await mapSettled(m, 2500);
     if (plan.night && st.utc != null) await updateVideoLayers(m, plan, st);  // and the city-light tiles for this view
-    const pct = Math.round(100 * i / steps);
-    $("videoStatus").textContent = `Loading map… ${pct} %`;
-    if (!$("videoProgress").hidden) videoProgress("Loading the map…", i / steps, "Getting ready to draw your video");
+    videoProgress("Loading the map…", i / steps, video.walked ? "New view: loading the map along the way" : "Only once: the map along the whole route");
     if (Date.now() - t0 > 30000) break;
   }
+  video.walked = { path, night: plan.night };
   aimVideoMap(m, videoState(plan, 0), W, H);
   if (plan.night) { const st = videoState(plan, 0); if (st.utc != null) { video.nightAt = null; video.lightsAt = null; await updateVideoLayers(m, plan, st); } }
   await mapSettled(m, 2500);
@@ -10087,7 +10193,7 @@ async function readyVideo(W, H) {
     plan.overviewKm = Math.min(26000, Math.max(1500, plan.spreadKm * 2.6 * W / band));
   }
   video.flights.forEach(f => logoImage(f.airline, true));  // start loading logos
-  $("videoStatus").textContent = "Loading map…";
+  $("videoStatus").textContent = "";
   const [, , logo] = await Promise.all([preloadVideoTiles(plan, W, H), waitForLogos(), exportLogo()]);
   video.logo = logo; video.logoBmp = null; video.logoRect = null;
   if ($("videoModal").hidden) throw new Error("Cancelled");
@@ -10099,8 +10205,10 @@ function playVideo(record) {  // also stops a download that is being made
   saveVideoPrefs();
   const run = video.run = {};  // a newer Replay while the map is loading replaces this one
   const [W, H] = VIDEO_FORMATS[$("videoFormat").value];
+  videoProgress("Getting your video ready…");
   readyVideo(W, H).then(plan => {
     if (run !== video.run || $("videoModal").hidden) return;
+    videoProgress(null);
     $("videoStatus").textContent = video.note || "";
     const canvas = $("videoCanvas"), ctx = canvas.getContext("2d");
     if (record) startRecording(canvas, plan.end);
@@ -10113,20 +10221,25 @@ function playVideo(record) {  // also stops a download that is being made
       else if (video.recorder && video.recorder.state === "recording") setTimeout(() => video.recorder.stop(), 300);
     };
     video.raf = requestAnimationFrame(frame);
-  }).catch(e => { $("videoStatus").textContent = e.message; });
+  }).catch(e => { if (run === video.run) videoProgress(null); $("videoStatus").textContent = e.message; });
 }
 const videoFileName = ext => `flight-${video.flights[0].date}-${video.flights.map(f => f.to).join("-")}`.replace(/[^\w.-]/g, "").slice(0, 120) + "." + ext;
 
 /* Download: render every frame (waiting for map tiles) and encode an H.264 MP4 in the browser (WebCodecs), so the
    file is smooth whatever the computer's speed. Browsers without WebCodecs record the playback in real time instead. */
 // the download's progress card: text, done as 0..1 (null: not known yet, the bar just moves), a note below
+// the card over the middle of the video while it gets ready or downloads: the step, a big percentage and a gauge in the
+// theme's colours (sliding while there's no percentage yet); Cancel only while a download is being made
 function videoProgress(text, done = null, note = "") {
   const box = $("videoProgress");
-  if (text == null) { box.hidden = true; return; }
+  if (text == null) { box.hidden = true; box.classList.remove("dl"); return; }
+  const c = $("videoCanvas");
+  box.style.top = `${c.offsetTop + c.offsetHeight / 2}px`;  // centred on the video itself, under the option bar
   box.hidden = false;
   $("vpText").textContent = text; $("vpNote").textContent = note;
+  $("vpPct").textContent = done == null ? "" : `${Math.round(done * 100)}%`;
   $("vpBar").classList.toggle("busy", done == null);
-  $("vpBar").firstElementChild.style.width = done == null ? "" : `${Math.round(done * 100)}%`;
+  $("vpBar").firstElementChild.style.width = done == null ? "" : `${Math.max(4, Math.round(done * 100))}%`;
 }
 async function exportVideo() {
   const [W, H] = EXPORT_FORMATS[$("videoFormat").value];
@@ -10149,6 +10262,7 @@ async function exportVideo() {
     await loadScript(MP4_MUXER);
     checkVideoWebgl();
     videoProgress("Loading the map…", null, "Getting ready to draw your video");
+    $("videoProgress").classList.add("dl");
     const plan = await readyVideo(W, H);
     const muxer = new Mp4Muxer.Muxer({ target: new Mp4Muxer.ArrayBufferTarget(), video: { codec: "avc", width: W, height: H }, fastStart: "in-memory" });
     let failure = null;
@@ -10699,9 +10813,18 @@ for (const [key, id] of [["tracks", "realTracks"], ["times", "realTimes"]]) {
 // The extras the first screen doesn't need (the flown tracks, the airline symbols) wait until the page has shown: they
 // load as soon as the Travel log or the Hangar opens, a video or image is made, or else once the browser is idle
 let extrasLoad = null;
+// the map library and the map's style, fetched ahead (once the page is idle, or the moment the Travel log tab is pointed
+// at or touched), so opening the Travel log doesn't wait for them
+let mapPrefetch = null;
+function prefetchMap() {
+  if (mapPrefetch || map) return;
+  mapPrefetch = Promise.all([loadScript(CDN.maplibre), loadCss(CDN.maplibreCss), mapStyle(baseKey())]).catch(() => { mapPrefetch = null; });
+}
+document.querySelectorAll('[data-tab="map"], [data-goto="map"]').forEach(b => ["pointerenter", "touchstart", "focus"].forEach(t => b.addEventListener(t, prefetchMap, { passive: true })));
 function loadExtras() {
   return extrasLoad || (extrasLoad = Promise.all([state.real.tracks || state.real.times ? ensureTracks() : null, ensureSymbols()])
-    .then(() => state.tab === "stats" ? addRealRecords() : render({})));
+    .then(() => state.tab === "stats" ? addRealRecords() : render({}))
+    .then(() => (window.requestIdleCallback || (f => setTimeout(f, 1500)))(() => { prefetchMap(); warmTripShots(); }, { timeout: 4000 })));
 }
 // On Statistics the tracks only add two records (highest altitude, top speed): they join the Records quietly instead of
 // the whole page being built again, which made it flicker just after the figures had counted up
